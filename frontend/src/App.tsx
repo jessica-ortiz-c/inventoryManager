@@ -1,6 +1,8 @@
 import React from 'react';
 import './App.css';
 
+import { useState, useEffect } from 'react';
+
 import { MenuItem, Select, Box, FormGroup, Checkbox, Button, FormControl, TextField,
    FormLabel, FormHelperText, FormControlLabel,Pagination } from '@mui/material';
 
@@ -30,30 +32,22 @@ const rowsSummary = [
   { id: 'Overall', totalProducts: 0 , totalValue: 0, averagePrice: 0 },
 ];
 
- {/* Rows for testing datagrid */}
-const rows = [
-  { id: 1,  category: 'Lácteos', name: 'Leche entera', price: '$25.00', 'expiration date': '2025-07-01', stock: 34, actions: 'Editar | Eliminar' },
-  { id: 2, category: 'Panadería', name: 'Pan integral',  price: '$18.50', 'expiration date': '2025-06-15', stock: 50, actions: 'Editar | Eliminar' },
-  { id: 3,  category: 'Lácteos', name: 'Queso Oaxaca', price: '$55.00', 'expiration date': '2025-07-05', stock: 20, actions: 'Editar | Eliminar' },
-  { id: 4, category: 'Lácteos', name: 'Yogur griego',  price: '$30.00', 'expiration date': '2025-07-10', stock: 15, actions: 'Editar | Eliminar' },
-  { id: 5,  category: 'Despensa', name: 'Arroz integral', price: '$22.00', 'expiration date': '2026-01-01', stock: 120, actions: 'Editar | Eliminar' },
-  { id: 6, category: 'Frescura', name: 'Huevos orgánicos', price: '$40.00', 'expiration date': '2025-06-20', stock: 60, actions: 'Editar | Eliminar' },
-  { id: 7,  category: 'Despensa', name: 'Aceite de oliva', price: '$75.00', 'expiration date': '2026-03-12', stock: 35, actions: 'Editar | Eliminar' },
-  { id: 8, category: 'Desayuno', name: 'Cereal de avena',  price: '$28.00', 'expiration date': '2026-02-15', stock: 25, actions: 'Editar | Eliminar' },
-  { id: 9,  category: 'Frutas', name: 'Manzanas rojas', price: '$15.00', 'expiration date': '2025-06-14', stock: 80, actions: 'Editar | Eliminar' },
-  { id: 10,  category: 'Frutas', name: 'Plátanos', price: '$12.00', 'expiration date': '2025-06-12', stock: 70, actions: 'Editar | Eliminar' },
-  { id: 11,  category: 'Limpieza', name: 'Detergente líquido', price: '$45.00', 'expiration date': '2027-05-01', stock: 40, actions: 'Editar | Eliminar' },
-  { id: 12, category: 'Higiene',name: 'Jabón en barra', price: '$10.00', 'expiration date': '2027-01-10', stock: 90, actions: 'Editar | Eliminar' },
-  { id: 13,  category: 'Hogar', name: 'Papel higiénico', price: '$35.00', 'expiration date': '2029-12-31', stock: 100, actions: 'Editar | Eliminar' },
-  { id: 14, category: 'Despensa', name: 'Atún en lata', price: '$18.00', 'expiration date': '2027-09-01', stock: 45, actions: 'Editar | Eliminar' },
-  { id: 15,  category: 'Bebidas', name: 'Agua embotellada', price: '$9.00', 'expiration date': '2026-04-22', stock: 200, actions: 'Editar | Eliminar' },
-];
-
-
 
 function App() {
-  console.log("App cargando");
+  console.log("App loading ...");
+
+  const [products, setProducts] = useState([]);
+
+  // Loads the products 
+  useEffect(() => {
+    fetch('http://localhost:9090/products')
+      .then((res) => res.json()) 
+      .then((data) => setProducts(data))
+      .catch((err) => console.error(err)); 
+  }, []);
+
   return (
+
     <div className="App">
       <header className="App-header">
         
@@ -104,7 +98,7 @@ function App() {
          {/* Third component and Fourth component */}
         <Box style={{ width: '100%' }}>
           <DataGrid 
-            rows={rows}
+            rows={products}
             columns={columns}
             checkboxSelection
             hideFooter
