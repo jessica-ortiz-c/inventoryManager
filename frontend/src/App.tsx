@@ -5,7 +5,7 @@ import { useState, useEffect } from 'react';
 
 import { MenuItem, Select, Box, FormGroup, Checkbox, Button, FormControl, TextField,
    FormLabel, FormHelperText, FormControlLabel,Pagination } from '@mui/material';
-
+import ProductTable from './components/ProductTable';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 
 
@@ -96,25 +96,11 @@ function App() {
 
         
          {/* Third component and Fourth component */}
-        <Box style={{ width: '100%' }}>
-          <DataGrid 
-            rows={products}
-            columns={columns}
-            checkboxSelection
-            hideFooter
-            initialState={{
-              pagination: {
-                paginationModel: { pageSize: 10, page: 0 },
-              },
-            }}
-            disableColumnMenu
-            
-
-          />
+        <ProductTable/>
           {/* <Pagination count={10} sx={{display: 'flex', alignContent:'center', justifyContent:'center'}} /> */}
-        </Box>
+        
 
-
+        
         <Box sx={{}}>
             <DataGrid sx={{p:'10px', 
             '& .MuiDataGrid-cell':{display: 'flex', alignContent:'center'}, 
@@ -125,7 +111,7 @@ function App() {
             hideFooter
             autoHeight
           />
-
+        
 
         </Box>
       </main>

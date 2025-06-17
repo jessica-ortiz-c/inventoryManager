@@ -9,11 +9,15 @@ import java.util.stream.*;
 import java.util.UUID;
 import java.time.LocalDate;
 
+import org.springframework.http.ResponseEntity;
 
 
 @RestController
 @RequestMapping("/products")
-@CrossOrigin
+
+
+@CrossOrigin(origins = "http://192.168.1.72:3000/", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
+
 public class ProductController {
 
     private final ProductRepository repository;
@@ -121,4 +125,15 @@ public class ProductController {
         p.setUpdateDate(LocalDate.now()); 
         return repository.save(p);
     }
+
+    //DELETE
+  @DeleteMapping("/{id}")
+public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
+    Product existing = repository.findById(id);
+    if (existing == null) {
+        return ResponseEntity.notFound().build();
+    }
+    repository.delete(id);
+    return ResponseEntity.noContent().build();
+}
 }
