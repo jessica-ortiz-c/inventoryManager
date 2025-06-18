@@ -7,7 +7,7 @@ import ProductFilter from './components/ProductFilter';
 import NewProductButton from './components/NewProductButton';
 import ProductTable from './components/ProductTable';
 import ProductSummary from './components/ProductSummary';
-
+import ProductModal from './components/ProductModal';
 
 const handleNewProductClick = () => {
   console.log("New product button clicked");
@@ -18,6 +18,10 @@ function App() {
   console.log("App loading ...");
 
   const [products, setProducts] = useState([]);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleOpenModal = () => setIsModalOpen(true);
+  const handleCloseModal = () => setIsModalOpen(false);
 
   // Loads the products 
   useEffect(() => {
@@ -35,12 +39,13 @@ function App() {
           <ProductFilter/>
       
           {/* Second component */}
-          <NewProductButton onClick={handleNewProductClick} />
+          <NewProductButton onClick={handleOpenModal} />
           
           {/* Third component and Fourth component */}
           <ProductTable/>
           {/* <Pagination count={10} sx={{display: 'flex', alignContent:'center', justifyContent:'center'}} /> */}
           
+          <ProductModal open={isModalOpen} onClose={handleCloseModal}></ProductModal>
            {/* Last component */}
           <ProductSummary/>
         </main>

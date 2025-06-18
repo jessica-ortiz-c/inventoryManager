@@ -39,6 +39,10 @@ function ProductTable() {
     }
   };
 
+  const handleEdit = (product: Product) =>{
+      
+  }
+
   const columns = [
     { field: 'category', headerName: 'Category', flex: 1 },
     { field: 'name', headerName: 'Name', flex: 1 },
