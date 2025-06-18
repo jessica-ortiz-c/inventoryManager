@@ -3,14 +3,7 @@ import { DataGrid } from '@mui/x-data-grid';
 import { IconButton } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
 
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  stock: number;
-  expirationDate: string;
-}
+import { Product } from '../types/Product';
 
 function ProductTable() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -72,7 +65,7 @@ function ProductTable() {
     <DataGrid
       rows={products}
       columns={columns}
-      getRowId={(row) => row.id}
+      getRowId={(row) => row.id!}
       initialState={{
         pagination: { paginationModel: { pageSize: 10, page: 0 } },
       }}

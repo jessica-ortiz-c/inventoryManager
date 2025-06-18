@@ -5,13 +5,13 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-
+import java.util.List;
 
 public class Product {
 
     private UUID id; 
     private String name;
-    private String category;
+    private List<String> category; //For a list of categories
     private BigDecimal price;
     private LocalDate expirationDate;
     private Integer stock;
@@ -31,7 +31,7 @@ public class Product {
     // Getters
     public UUID getId() { return id; }
     public String getName() { return name; }
-    public String getCategory() { return category; }
+    public List<String> getCategory() {return category;}
     public BigDecimal getPrice() { return price; }
     public LocalDate getExpirationDate() { return expirationDate; }
     public Integer getStock() { return stock; }
@@ -41,7 +41,7 @@ public class Product {
     // Setters
     public void setId(UUID id) { this.id = id; }
     public void setName(String name) { this.name = name; }
-    public void setCategory(String category) { this.category = category; }
+    public void setCategory(List<String> category) {this.category = category;}
     public void setPrice(BigDecimal price) { this.price = price; }
     public void setExpirationDate(LocalDate expirationDate) { this.expirationDate = expirationDate; }
     public void setStock(Integer stock) { this.stock = stock; }

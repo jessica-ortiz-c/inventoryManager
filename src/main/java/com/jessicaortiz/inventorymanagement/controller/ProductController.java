@@ -43,14 +43,15 @@ public class ProductController {
                     .contains(name.toLowerCase()));
         }
         if (category != null && !category.isEmpty()) {
-            stream = stream.filter(p -> p.getCategory() != null &&
-                    p.getCategory().equalsIgnoreCase(category));  
+            stream = stream.filter(p -> 
+                p.getCategory() != null &&
+                p.getCategory().stream().anyMatch(c -> c.equalsIgnoreCase(category))
+            );
+
         }
         
         return stream.toList();
     }
-  
-
     
     //POST /products
     //Creates a product
@@ -99,9 +100,7 @@ public class ProductController {
         return repository.save(existing);
     }
   
-    
     //POST /products/{id}/outofstock
-    //
     @PostMapping("/{id}/outofstock")
     public Product outOfStock(@PathVariable UUID id){
         Product p = repository.findById(id);
@@ -113,8 +112,7 @@ public class ProductController {
         return repository.save(p);
     }
   
-  //PUT /products/{id}/instock
-  
+    //PUT /products/{id}/instock
     @PutMapping("/{id}/instock")
     public Product inStock(@PathVariable UUID id,@RequestParam int stock){
         Product p = repository.findById(id);
@@ -127,8 +125,8 @@ public class ProductController {
     }
 
     //DELETE
-  @DeleteMapping("/{id}")
-public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
     Product existing = repository.findById(id);
     if (existing == null) {
         return ResponseEntity.notFound().build();

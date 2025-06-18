@@ -2,6 +2,8 @@ import React from 'react';
 import { Box } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 
+
+
 const columnsSummary = [
   { field: 'id', headerName: '', flex: 0.5 },
   { field: 'totalProducts', headerName: 'Total products in Stock', flex: 1 },
