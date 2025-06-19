@@ -5,15 +5,11 @@ import { useState, useEffect } from 'react';
 
 import ProductFilter from './components/ProductFilter';   
 import ProductManager from './components/ProductManager';
-import ProductSummary from './components/ProductSummary';
+
 import ProductModal from './components/ProductModal';
 import { Product } from './types/Product';
 import { CategoryProvider } from './context/CategoryContext';
 
-/* const handleNewProductClick = () => {
-  console.log("New product button clicked");
-  //OnClick func
-}; */
 
 function App() {
   console.log("App loading ...");
@@ -21,11 +17,6 @@ function App() {
   const [products, setProducts] = useState<Product[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<Product | undefined>();
-
-/*   const handleOpenModal = () => {
-    setProductToEdit(undefined); // limpia si es nuevo
-    setIsModalOpen(true);
-  }; */
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -91,8 +82,7 @@ function App() {
             product={productToEdit}
             onSave={handleSaveProduct}
           />
-           {/* Last component */}
-          <ProductSummary/>
+          
         </main>
       </header >
     </div>

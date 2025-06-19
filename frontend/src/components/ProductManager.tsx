@@ -1,9 +1,11 @@
 import { useState, useEffect } from 'react';
+
+import { Product } from '../types/Product';
+
 import ProductTable from './ProductTable';
 import ProductModal from './ProductModal';
-import { Product } from '../types/Product';
 import NewProductButton from './NewProductButton';
-
+import ProductSummary from './ProductSummary';
 
 function ProductManager() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -39,7 +41,7 @@ function ProductManager() {
     });
 
     if (response.ok) {
-      await fetchProducts(); // recargar lista
+      await fetchProducts(); // Refresh products
       setOpen(false);
     } else {
       alert('Error saving product');
@@ -55,7 +57,7 @@ function ProductManager() {
     });
 
     if (res.ok) {
-      fetchProducts();
+      await fetchProducts(); // Refresh products
     } else {
       alert('Error deleting');
     }
@@ -63,10 +65,14 @@ function ProductManager() {
 
   return (
     <>
-         <NewProductButton onClick={() => {
-            setSelectedProduct(undefined);
-            setOpen(true);
-            }} />
+      <NewProductButton
+        onClick={() => {
+          setSelectedProduct(undefined);
+          setOpen(true);
+        }}
+      />
+
+    
       <ProductTable
         products={products}
         onEdit={(p) => {
@@ -75,6 +81,8 @@ function ProductManager() {
         }}
         onDelete={handleDelete}
       />
+
+      <ProductSummary products={products} />
 
       <ProductModal
         open={open}
