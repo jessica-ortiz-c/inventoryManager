@@ -1,7 +1,4 @@
-import React from 'react';
 import { Button } from '@mui/material';
-
-import BasicModal from './ProductModal';
 
 function NewProductButton({ onClick }: { onClick: () => void }) {
   return (

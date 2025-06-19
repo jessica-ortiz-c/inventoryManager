@@ -77,7 +77,7 @@ public class ProductController {
     @PutMapping("/{id}")
     public Product update(@PathVariable UUID id,@RequestBody Product product){
         Product existing = repository.findById(id);
-        System.out.println(id);
+        //System.out.println(id);
         if (existing == null) {
             throw new RuntimeException("Product not found.");
         }
