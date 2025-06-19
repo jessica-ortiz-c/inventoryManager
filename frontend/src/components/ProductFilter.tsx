@@ -20,6 +20,8 @@ function ProductFilter() {
             <MenuItem value="Electronics">Electronics</MenuItem>
             <MenuItem value="Clothing">Clothing</MenuItem>
           </Select>
+
+          
         </Box>
 
         {/* Availability */}

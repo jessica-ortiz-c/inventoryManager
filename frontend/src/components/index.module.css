@@ -9,6 +9,9 @@
   cursor: ew-resize;
   font-weight: bold;
   user-select: none;
+  display: block !important;
+  opacity: 1 !important;
+  
 }
 
 .ScrubAreaCursor {

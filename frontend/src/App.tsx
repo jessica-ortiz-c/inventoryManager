@@ -1,20 +1,19 @@
-import React from 'react';
+
 import './App.css';
 
 import { useState, useEffect } from 'react';
 
 import ProductFilter from './components/ProductFilter';   
-import NewProductButton from './components/NewProductButton';
-import ProductTable from './components/ProductTable';
+import ProductManager from './components/ProductManager';
 import ProductSummary from './components/ProductSummary';
 import ProductModal from './components/ProductModal';
 import { Product } from './types/Product';
+import { CategoryProvider } from './context/CategoryContext';
 
-
-const handleNewProductClick = () => {
+/* const handleNewProductClick = () => {
   console.log("New product button clicked");
   //OnClick func
-};
+}; */
 
 function App() {
   console.log("App loading ...");
@@ -23,10 +22,10 @@ function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<Product | undefined>();
 
-  const handleOpenModal = () => {
+/*   const handleOpenModal = () => {
     setProductToEdit(undefined); // limpia si es nuevo
     setIsModalOpen(true);
-  };
+  }; */
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
@@ -41,7 +40,7 @@ function App() {
   };
 
   useEffect(() => {
-    loadProducts(); // carga inicial
+    loadProducts(); // first load
   }, []);
 
   const handleSaveProduct = async (product: Product) => {
@@ -75,17 +74,15 @@ function App() {
   };
 
   return (
+    <CategoryProvider>
     <div className="App">
       <header className="App-header">
         <main className="App-body">
           {/* First component */}
           <ProductFilter/>
       
-          {/* Second component */}
-          <NewProductButton onClick={handleOpenModal} />
-          
           {/* Third component and Fourth component */}
-          <ProductTable/>
+          <ProductManager />
           {/* <Pagination count={10} sx={{display: 'flex', alignContent:'center', justifyContent:'center'}} /> */}
           
          <ProductModal
@@ -99,6 +96,7 @@ function App() {
         </main>
       </header >
     </div>
+    </CategoryProvider>
   );
 }
 

@@ -1,11 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { Autocomplete, Modal, Box, Button, FormControl, FormLabel, Select, MenuItem, TextField } from '@mui/material';
+import { Autocomplete, Modal, Box, Button, FormControl, FormLabel, TextField } from '@mui/material';
 import { NumberField } from '@base-ui-components/react/number-field';
 import styles from './index.module.css';
 import { Product } from '../types/Product';
-
-const categoriesOptions = ['Food', 'Electronics', 'Clothing'];
-
+import { useCategoryContext } from '../context/CategoryContext';
 
 interface ProductModalProps {
   open: boolean;
@@ -30,6 +28,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
   const id = React.useId();
 
   const [name, setName] = useState('');
+  const { categories, addCategory } = useCategoryContext(); //Context for categories, it helps to new categories be saved 
   const [category, setCategory] = useState<string[]>([]);
   const [stock, setStock] = useState(0);
   const [price, setPrice] = useState(0);
@@ -80,7 +79,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
         <FormControl component="fieldset" variant="standard" fullWidth>
           {/* Name */}
           <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel sx={{ minWidth: 150 }}>Name</FormLabel>
+            <FormLabel sx={{ minWidth: 100 }}>Name</FormLabel>
             <TextField
               required
               value={name}
@@ -92,14 +91,15 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
           {/* Category */}
           <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel sx={{ minWidth: 150 }}>Category</FormLabel>
-             <Autocomplete
+            <FormLabel sx={{ minWidth: 100 }}>Category</FormLabel>
+             <Autocomplete sx={{ flex: 1}}
               multiple
               freeSolo
-              options={categoriesOptions}
+              options={categories}
               value={category}
               onChange={(event, newValue) => {
                 setCategory(newValue);
+                newValue.forEach((cat) => addCategory(cat)); // registra nuevas
               }}
               renderInput={(params) => (
                 <TextField {...params} label="Category" placeholder="Select or type" />
@@ -109,7 +109,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
           {/* Stock */}
           <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel sx={{ minWidth: 150 }}>Stock</FormLabel>
+            <FormLabel sx={{ minWidth: 100 }}>Stock</FormLabel>
             <NumberField.Root id={id} value={stock} min={0} max={1000} className={styles.Field}>
               <NumberField.Group className={styles.Group}>
                 <NumberField.Decrement
@@ -124,7 +124,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
                   value={stock}
                   onChange={(e) => setStock(Number(e.target.value))}
                 />
-
                 <NumberField.Increment
                   className={styles.Increment}
                   onClick={() => setStock((prev) => prev + 1)}
@@ -137,8 +136,9 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
           {/* Unit Price */}
           <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel sx={{ minWidth: 150 }}>Unit Price</FormLabel>
+            <FormLabel sx={{ minWidth: 100 }}>Unit Price</FormLabel>
             <NumberField.Root id={id} value={price} min={0} max={1000} className={styles.Field}>
+              
               <NumberField.Group className={styles.Group}>
                 <NumberField.Decrement
                   className={styles.Decrement}
@@ -146,7 +146,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
                 >
                   <MinusIcon />
                 </NumberField.Decrement>
-
                 <NumberField.Input
                   className={styles.Input}
                   value={price}
@@ -155,7 +154,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
                     if (!isNaN(newValue)) setPrice(newValue);
                   }}
                 />
-
                 <NumberField.Increment
                   className={styles.Increment}
                   onClick={() => setPrice((prev) => prev + 1)}
@@ -168,7 +166,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
           {/* Expiration Date */}
           <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel sx={{ minWidth: 150 }}>Expiration Date</FormLabel>
+            <FormLabel sx={{ minWidth: 100 }}>Expiration Date</FormLabel>
             <TextField
               type="date"
               value={expirationDate || ''} // convierte null a string vacío
@@ -180,10 +178,15 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
           {/* Buttons */}
           <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, gap: 2 }}>
-            <Button variant="outlined" onClick={onClose}>Cancel</Button>
-            <Button variant="contained" color="primary" onClick={handleSave}>
-              Save
-            </Button>
+            <Button 
+              variant="outlined" 
+              color="primary" 
+              onClick={handleSave}
+              sx={{flex: 1}}> Save</Button>
+            <Button 
+              variant="outlined" 
+              onClick={onClose}
+              sx={{flex: 1}} >Cancel</Button>
           </Box>
         </FormControl>
       </Box>
@@ -193,15 +196,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
 export default ProductModal;
 
-// Icons
-
-function CursorGrowIcon(props: React.ComponentProps<'svg'>) {
-  return (
-    <svg width="26" height="14" viewBox="0 0 24 14" fill="black" stroke="white" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path d="M19.5 5.5L6.5 5.5V2L1 7L6.5 12V8.5H19.5V12L25 7L19.5 2V5.5Z" />
-    </svg>
-  );
-}
+// Functions for FieldNumber
 
 function PlusIcon(props: React.ComponentProps<'svg'>) {
   return (
