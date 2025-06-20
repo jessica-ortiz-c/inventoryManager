@@ -44,6 +44,7 @@ function ProductTable({ products, onEdit, onDelete }: ProductTableProps) {
         pagination: { paginationModel: { pageSize: 10, page: 0 } },
       }}
       disableColumnMenu
+      pageSizeOptions={[10]} 
       checkboxSelection
     />
   );
