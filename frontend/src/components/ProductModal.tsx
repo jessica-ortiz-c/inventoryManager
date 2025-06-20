@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Autocomplete, Modal, Box, Button, FormControl, FormLabel, TextField } from '@mui/material';
-import { NumberField } from '@base-ui-components/react/number-field';
+import { Autocomplete, Modal, Box, Button, FormLabel, TextField } from '@mui/material';
+import { NumberField } from '@base-ui-components/react';
 import styles from './index.module.css';
 import { Product } from '../types/Product';
 import { useCategoryContext } from '../context/CategoryContext';
@@ -75,12 +75,12 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box sx={style}>
-        <FormControl component="fieldset" variant="standard" fullWidth>
+      <Box sx={style}  >
+       
           {/* Name */}
           <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel sx={{ minWidth: 100 }}>Name</FormLabel>
-            <TextField
+            <FormLabel htmlFor="product-name" sx={{ minWidth: 100 }}>Name</FormLabel>
+            <TextField id='product-name'
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
@@ -91,8 +91,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
           {/* Category */}
           <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel sx={{ minWidth: 100 }}>Category</FormLabel>
-             <Autocomplete sx={{ flex: 1}}
+            <FormLabel htmlFor="product-category" sx={{ minWidth: 100 }}>Category</FormLabel>
+             <Autocomplete id='categories' sx={{ flex: 1}}
               multiple
               freeSolo
               options={categories}
@@ -102,14 +102,16 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
                 newValue.forEach((cat) => addCategory(cat)); // registra nuevas
               }}
               renderInput={(params) => (
-                <TextField {...params} label="Category" placeholder="Select or type" />
+                <TextField {...params}
+                  id='product-category'
+                  label="Category" placeholder="Select or type" />
               )}
             />
           </Box>
 
           {/* Stock */}
           <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel sx={{ minWidth: 100 }}>Stock</FormLabel>
+            <FormLabel htmlFor="product-stock" sx={{ minWidth: 100 }}>Stock</FormLabel>
             <NumberField.Root id={id} value={stock} min={0} max={1000} className={styles.Field}>
               <NumberField.Group className={styles.Group}>
                 <NumberField.Decrement
@@ -119,10 +121,14 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
                   <MinusIcon />
                 </NumberField.Decrement>
 
-                <NumberField.Input
+                <NumberField.Input id='product-stock'
                   className={styles.Input}
                   value={stock}
-                  onChange={(e) => setStock(Number(e.target.value))}
+
+                  onChange={(e) => {
+                    const newValue = Number(e.target.value);
+                    if (!isNaN(newValue)) setStock(newValue);
+                  }}
                 />
                 <NumberField.Increment
                   className={styles.Increment}
@@ -136,7 +142,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
           {/* Unit Price */}
           <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel sx={{ minWidth: 100 }}>Unit Price</FormLabel>
+            <FormLabel htmlFor="product-price" sx={{ minWidth: 100 }}>Unit Price</FormLabel>
             <NumberField.Root id={id} value={price} min={0} max={1000} className={styles.Field}>
               
               <NumberField.Group className={styles.Group}>
@@ -146,7 +152,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
                 >
                   <MinusIcon />
                 </NumberField.Decrement>
-                <NumberField.Input
+                <NumberField.Input id="product-price"
                   className={styles.Input}
                   value={price}
                   onChange={(e) => {
@@ -166,8 +172,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
           {/* Expiration Date */}
           <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel sx={{ minWidth: 100 }}>Expiration Date</FormLabel>
-            <TextField
+            <FormLabel htmlFor="expiration-date" sx={{ minWidth: 100 }}>Expiration Date</FormLabel>
+            <TextField id='expiration-date'
               type="date"
               value={expirationDate || ''} // convierte null a string vacío
               onChange={(e) => setExpirationDate(e.target.value || null)}
@@ -188,7 +194,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
               onClick={onClose}
               sx={{flex: 1}} >Cancel</Button>
           </Box>
-        </FormControl>
       </Box>
     </Modal>
   );
