@@ -69,10 +69,8 @@ function App() {
     <div className="App">
       <header className="App-header">
         <main className="App-body">
-          {/* First component */}
-          <ProductFilter/>
-      
-          {/* Third component and Fourth component */}
+
+          {/*Manages the components */}
           <ProductManager />
           {/* <Pagination count={10} sx={{display: 'flex', alignContent:'center', justifyContent:'center'}} /> */}
           
