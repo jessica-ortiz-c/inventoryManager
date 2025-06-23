@@ -15,7 +15,7 @@ const columnsSummary = [
 ];
 
 function ProductSummary({products}: ProductSummaryProps) {
-
+  if (!Array.isArray(products)) return null;
   //Stores data by category, e.g. => "Food": {totalProducts: 5, totalValue: 100}
   const summaryByCategory: { [key: string]: { totalProducts: number; totalValue: number } } = {};
 
