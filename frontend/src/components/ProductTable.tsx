@@ -1,8 +1,9 @@
+import {useState } from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { IconButton } from '@mui/material';
+import { Box, IconButton, Pagination } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
-
 import { Product } from '../types/Product';
+
 interface ProductTableProps {
   products: Product[];
   onEdit: (product: Product) => void;
@@ -35,18 +36,35 @@ function ProductTable({ products, onEdit, onDelete }: ProductTableProps) {
     },
   ];
 
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 10;
+  const paginatedProducts = products.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+
   return (
-    <DataGrid
-      rows={products}
-      columns={columns}
-      getRowId={(row) => row.id!}
-      initialState={{
-        pagination: { paginationModel: { pageSize: 10, page: 0 } },
-      }}
-      disableColumnMenu
-      pageSizeOptions={[10]} 
-      checkboxSelection
-    />
+    <Box sx={{display: 'flex', alignItems: 'center', flexDirection:'column'}}>
+      <DataGrid
+        rows={paginatedProducts}
+        columns={columns}
+        getRowId={(row) => row.id!}
+        pageSizeOptions={[5, 10, 20]}
+        autoHeight
+        checkboxSelection
+        hideFooter
+        disableColumnMenu
+        sx={{width: '100%'}}
+      />
+      
+      <Pagination
+        count={Math.ceil(products.length / itemsPerPage)}
+        page={page}
+        onChange={(e, value) => setPage(value)}
+        sx={{  mt: 2 }}
+      />
+    </Box>
   );
 }
+
 export default ProductTable;
