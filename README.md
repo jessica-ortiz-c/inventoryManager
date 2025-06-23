@@ -10,11 +10,11 @@ This breakable toy I consists in an **inventory manager** project, developed to 
 
 
 ## 📚 Table of Contents
-- [Prerequisite](#️🛠️-prerequisites)
-- [Installation](#📦-installation)
-- [Usage](#🚀-usage)
-- [Project Goals and Challenges](#🎯-project-goals-and-challenges)
-- [Key Features](#📌-key-features)
+- [Prerequisite](#️-prerequisites)
+- [Installation](#-installation)
+- [Usage](#-usage)
+- [Project Goals and Challenges](#-project-goals-and-challenges)
+- [Key Features](#-key-features)
 - [Project Structure](#️-project-structure)
 
 <!-- - [Images] -->
