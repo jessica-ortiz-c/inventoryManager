@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Autocomplete, Modal, Box, Button, FormLabel, TextField } from '@mui/material';
 import { NumberField } from '@base-ui-components/react';
-import styles from './index.module.css';
+import styles from './styles/ProductModal.module.css';
 import { Product } from '../types/Product';
 import { useCategoryContext } from '../context/CategoryContext';
 
@@ -78,31 +78,33 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
       <Box sx={style}  >
        
           {/* Name */}
-          <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel htmlFor="product-name" sx={{ minWidth: 100 }}>Name</FormLabel>
-            <TextField id='product-name'
+          <Box className={styles.box}>
+            <FormLabel htmlFor="product-name" className={styles.formlabel}>Name</FormLabel>
+            <TextField id='product-name' className={styles.inputfield}
               required
+              label='Name'
               value={name}
               onChange={(e) => setName(e.target.value)}
               variant="outlined"
-              sx={{ flex: 1 }}
+          
             />
           </Box>
 
           {/* Category */}
-          <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel htmlFor="product-category" sx={{ minWidth: 100 }}>Category</FormLabel>
-             <Autocomplete id='categories' sx={{ flex: 1}}
+          <Box className={styles.box}>
+            <FormLabel htmlFor="product-category" className={styles.formlabel}>Category</FormLabel>
+             <Autocomplete id='categories' className={styles.inputfield}
               multiple
               freeSolo
               options={categories}
               value={category}
               onChange={(event, newValue) => {
                 setCategory(newValue);
-                newValue.forEach((cat) => addCategory(cat)); // registra nuevas
+                newValue.forEach((cat) => addCategory(cat)); // adds new categories
               }}
               renderInput={(params) => (
                 <TextField {...params}
+                  required  
                   id='product-category'
                   label="Category" placeholder="Select or type" />
               )}
@@ -110,8 +112,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
           </Box>
 
           {/* Stock */}
-          <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel htmlFor="product-stock" sx={{ minWidth: 100 }}>Stock</FormLabel>
+           <Box className={styles.box} > 
+            <FormLabel htmlFor="product-stock" className={styles.formlabel}>Stock</FormLabel>
             <NumberField.Root id={id} value={stock} min={0} max={1000} className={styles.Field}>
               <NumberField.Group className={styles.Group}>
                 <NumberField.Decrement
@@ -141,8 +143,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
           </Box>
 
           {/* Unit Price */}
-          <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel htmlFor="product-price" sx={{ minWidth: 100 }}>Unit Price</FormLabel>
+          <Box className={styles.box}>
+            <FormLabel htmlFor="product-price" className={styles.formlabel}>Unit Price</FormLabel>
             <NumberField.Root id={id} value={price} min={0} max={1000} className={styles.Field}>
               
               <NumberField.Group className={styles.Group}>
@@ -171,28 +173,27 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
           </Box>
 
           {/* Expiration Date */}
-          <Box sx={{ display: 'flex', gap: 2, m: 1, alignItems: 'center' }}>
-            <FormLabel htmlFor="expiration-date" sx={{ minWidth: 100 }}>Expiration Date</FormLabel>
-            <TextField id='expiration-date'
+          <Box className={styles.box}>
+            <FormLabel htmlFor="expiration-date" className={styles.formlabel} >Expiration Date</FormLabel>
+            <TextField id='expiration-date' className={styles.inputfield}
               type="date"
-              value={expirationDate || ''} // convierte null a string vacío
+              value={expirationDate || ''} // converts to null
               onChange={(e) => setExpirationDate(e.target.value || null)}
               variant="outlined"
-              sx={{ flex: 1 }}
             />
           </Box>
 
           {/* Buttons */}
-          <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2, gap: 2 }}>
-            <Button 
-              variant="outlined" 
+          <Box className={styles.boxbtn} >
+            <Button className={styles.savebtn}
+              variant="contained" 
               color="primary" 
               onClick={handleSave}
-              sx={{flex: 1}}> Save</Button>
-            <Button 
+              > Save</Button>
+            <Button className={styles.cancelbtn}
               variant="outlined" 
               onClick={onClose}
-              sx={{flex: 1}} >Cancel</Button>
+             >Cancel</Button>
           </Box>
       </Box>
     </Modal>
