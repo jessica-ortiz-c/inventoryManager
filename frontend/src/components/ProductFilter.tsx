@@ -2,6 +2,8 @@ import React, { useState , useEffect } from 'react';
 import { Box, FormControl, FormLabel, TextField,Select,  MenuItem,  Button,  Autocomplete } from '@mui/material';
 import { useCategoryContext } from '../context/CategoryContext';
 import styles from './styles/ProductFilter.module.css'
+import '../App.css'; // o el nombre del archivo global donde definiste la clase
+
 
 interface FilterProps {
   onFilter: (filters: {
@@ -28,12 +30,12 @@ function ProductFilter({ onFilter }: FilterProps) {
 
 
   return (
-    <Box component="section" className={styles.section} sx={{ p: 2, border: '1px solid' }}>
+    <Box component="section" className={styles.section}>
 
         {/* Name */}
         <Box className={styles.box}>  {/* sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, m: 2 }} */}
           <FormLabel className={styles.label}
-            sx={{ minWidth: 150 }}>Name</FormLabel>
+            >Name</FormLabel>
           <TextField
             id="product-name"
             variant="outlined"
@@ -45,8 +47,7 @@ function ProductFilter({ onFilter }: FilterProps) {
 
         {/* Category */}
         <Box className={styles.box}>
-          <FormLabel className={styles.label}
-          sx={{ minWidth: 150 }}>Category</FormLabel>
+          <FormLabel className={styles.label}>Category</FormLabel>
           <Autocomplete
             multiple
             options={categories}
@@ -59,8 +60,7 @@ function ProductFilter({ onFilter }: FilterProps) {
 
         {/* Availability */}
         <Box className={styles.box}>
-          <FormLabel className={styles.label}
-          sx={{ minWidth: 150 }}>Availability</FormLabel>
+          <FormLabel className={styles.label} >Availability</FormLabel>
           <Select
             id="availability"
             value={availability}
@@ -71,7 +71,8 @@ function ProductFilter({ onFilter }: FilterProps) {
             <MenuItem value="out">Out of Stock</MenuItem>
             <MenuItem value="all">All</MenuItem>
           </Select>
-          <Button variant="outlined" onClick={handleSearch}>
+          <Button variant="outlined" className={styles.searchbtn}
+          onClick={handleSearch}>
             Search
           </Button>
         </Box>

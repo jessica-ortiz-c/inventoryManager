@@ -17,7 +17,7 @@ import org.springframework.http.ResponseEntity;
 
 //home http://192.168.1.72:3000/ 
 //office http://172.20.44.60:3000/
-@CrossOrigin(origins = "http://172.20.44.60:3000/", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
+@CrossOrigin(origins = "http://192.168.1.72:3000/", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 
 public class ProductController {
 

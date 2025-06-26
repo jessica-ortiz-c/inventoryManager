@@ -3,7 +3,7 @@
 }
 
 .App-header {
-  background-color: #e7efff;
+  background-color: #e9efffa2; /*e7efff*/
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -24,7 +24,21 @@
   padding: 20px;
 }
 
+@media (max-width: 600px) {
+  .App-body {
+     width: 95%;
+  }
+}
 
+/* Responsivo para pantallas medianas */
+@media (max-width: 900px) {
+  .App-body {
+     width: 95%;
+     
+  }
+}
+
+/*Colors for the rows based on date expiration */
 .row-red {
   background-color: rgba(255, 0, 0, 0.1);
 }
@@ -36,3 +50,18 @@
 .row-green {
   background-color: rgba(0, 255, 0, 0.1);
 }
+
+/* For categories selection look highlighting*/
+.MuiChip-root {
+  background-color: #e7d8ff  !important; 
+  color: #362e7d !important;
+}
+
+.MuiChip-deleteIcon {
+  color: #643a94 !important;
+}
+
+.MuiChip-deleteIcon:hover {
+  color: #3b1b5e !important;
+}
+
