@@ -1,0 +1,38 @@
+.box{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem; 
+    margin: 1.5rem;
+}
+
+.label{
+
+    color: black !important;
+    display: flex;
+    justify-content: left;
+    padding: 10px;
+    margin-left: 2.5rem;
+    min-width: 7rem;
+}
+
+.section{
+    background-color: #e9efffa2; /*f7e9ff*/ 
+    border-radius: 20px;
+    padding: 2;
+    border: 1px black solid;
+}
+
+
+.searchbtn{
+    background-color: #dddddd !important;
+    color: rgb(81, 81, 81);
+    border-color: rgb(81, 81, 81);
+}
+
+.searchbtn:hover{
+    background-color: #9e9e9e !important;
+    color: white;
+    border-color: white;
+    transition: background-color 0.5s ease;
+}

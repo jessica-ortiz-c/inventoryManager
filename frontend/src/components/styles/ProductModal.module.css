@@ -1,21 +1,75 @@
+
+.box{
+  display: flex;
+  align-items: 'center'; 
+  gap: 3rem;
+  margin: 10px;
+
+}
+
+.formlabel{
+  min-width: 100px;
+  display: flex;
+  align-items: center;
+  color: black;
+  margin: 2;
+}
+
+.inputfield{
+  display: flex;
+  flex:1;
+  width: 100px;
+}
+
+.boxbtn{
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+}
+
+/* Styles for save button*/
+
+.savebtn{
+  display: flex;
+  flex: 0.15;
+  justify-content:center;
+  align-items: flex-end;
+  background-color: rgb(63, 133, 255) !important;
+}
+
+
+.savebtn:hover{
+  background-color: rgb(165, 255, 188) !important;
+  border-color: #00ff51;
+  color: black;
+  transition: background-color 0.5s ease;
+}
+
+
+/* Styles for cancel button */
+
+.cancelbtn{
+  display: flex;
+  flex: 0.15;
+  justify-content:center;
+  align-items: flex-end;
+  color: rgb(63, 133, 255) !important;
+}
+
+.cancelbtn:hover{
+  background-color: rgb(255, 165, 165);
+  border-color: #ff0000;
+  color: black !important;
+  transition: background-color 0.5s ease;
+}
+
+/* Number Field */
+
 .Field {
   display: flex;
   flex-direction: column;
-  align-items: start;
+  align-items: center;
   gap: 0.25rem;
-}
-
-.ScrubArea {
-  cursor: ew-resize;
-  font-weight: bold;
-  user-select: none;
-  display: block !important;
-  opacity: 1 !important;
-  
-}
-
-.ScrubAreaCursor {
-  filter: drop-shadow(0 1px 1px #0008);
 }
 
 .Label {
@@ -95,3 +149,5 @@
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
 }
+
+

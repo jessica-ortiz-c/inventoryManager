@@ -15,7 +15,7 @@ const columnsSummary = [
 ];
 
 function ProductSummary({products}: ProductSummaryProps) {
-
+  if (!Array.isArray(products)) return null;
   //Stores data by category, e.g. => "Food": {totalProducts: 5, totalValue: 100}
   const summaryByCategory: { [key: string]: { totalProducts: number; totalValue: number } } = {};
 
@@ -44,19 +44,20 @@ function ProductSummary({products}: ProductSummaryProps) {
   const rowsSummary = Object.entries(summaryByCategory).map(([cat, data]) => ({
     id: cat, //category
     totalProducts: data.totalProducts,
-    totalValue: data.totalValue.toFixed(2),
-    averagePrice: data.totalProducts > 0 ? (data.totalValue / data.totalProducts).toFixed(2) : '0.00',
-  })); 
-
+    totalValue: data.totalValue.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }),
+  averagePrice: data.totalProducts > 0 
+    ? (data.totalValue / data.totalProducts).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })
+    : '$0.00',
+})); 
   
   rowsSummary.push({
-    id: 'Overall',
-    totalProducts: overallTotalProducts,
-    totalValue: overallTotalValue.toFixed(2),
-    averagePrice: overallTotalProducts > 0
-      ? (overallTotalValue / overallTotalProducts).toFixed(2)
-      : '0.00',
-  });
+  id: 'Overall',
+  totalProducts: overallTotalProducts,
+  totalValue: overallTotalValue.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }),
+  averagePrice: overallTotalProducts > 0
+    ? (overallTotalValue / overallTotalProducts).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })
+    : '$0.00',
+});
 
 
 

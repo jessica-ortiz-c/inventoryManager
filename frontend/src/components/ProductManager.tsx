@@ -80,7 +80,7 @@ const [filters, setFilters] = useState<Filters>({
     }
   };
 
-  // Esta función aplica el filtro a los productos según filters
+  // Apply the correspondent filters
   const applyFilters = (filters: Filters) => {
     const filtered = products.filter((product) => {
       const nameMatch = product.name.toLowerCase().includes(filters.name.toLowerCase());
@@ -101,6 +101,17 @@ const [filters, setFilters] = useState<Filters>({
       return nameMatch && categoryMatch && availabilityMatch;
     });
     setFilteredProducts(filtered);
+  };
+
+  const handleStockChange = (updatedProduct: Product) => {
+  setProducts((prev) =>
+    prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+  );
+
+  setFilteredProducts((prev) =>
+    prev.map((p) => (p.id === updatedProduct.id ? updatedProduct : p))
+  );
+
   };
 
   return (
@@ -126,6 +137,7 @@ const [filters, setFilters] = useState<Filters>({
           setOpen(true);
         }}
         onDelete={handleDelete}
+         onStockChange={handleStockChange}
       />
 
       <ProductSummary products={products} />
