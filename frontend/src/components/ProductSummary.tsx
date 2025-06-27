@@ -1,23 +1,20 @@
 
 import { Box } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
-import { Product } from '../types/Product';
+import { ProductSummaryProps } from '../types/Product';
 
-interface ProductSummaryProps {
-  products: Product[];
-}
+import { useMediaQuery, useTheme } from '@mui/material';
 
-const columnsSummary = [
-  { field: 'id', headerName: '', flex: 0.5 },
-  { field: 'totalProducts', headerName: 'Total products in Stock', flex: 1 },
-  { field: 'totalValue', headerName: 'Total Value in Stock', flex: 1 },
-  { field: 'averagePrice', headerName: 'Average price in Stock', flex: 1 },
-];
 
 function ProductSummary({products}: ProductSummaryProps) {
+  const theme = useTheme();
+  const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
+  
+
   if (!Array.isArray(products)) return null;
   //Stores data by category, e.g. => "Food": {totalProducts: 5, totalValue: 100}
   const summaryByCategory: { [key: string]: { totalProducts: number; totalValue: number } } = {};
+
 
   let overallTotalProducts = 0; 
   let overallTotalValue = 0;
@@ -45,21 +42,46 @@ function ProductSummary({products}: ProductSummaryProps) {
     id: cat, //category
     totalProducts: data.totalProducts,
     totalValue: data.totalValue.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }),
-  averagePrice: data.totalProducts > 0 
+    averagePrice: data.totalProducts > 0 
     ? (data.totalValue / data.totalProducts).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })
     : '$0.00',
-})); 
-  
+    })); 
+      
   rowsSummary.push({
-  id: 'Overall',
-  totalProducts: overallTotalProducts,
-  totalValue: overallTotalValue.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }),
-  averagePrice: overallTotalProducts > 0
+    id: 'Overall',
+    totalProducts: overallTotalProducts,
+    totalValue: overallTotalValue.toLocaleString('es-MX', { style: 'currency', currency: 'MXN' }),
+    averagePrice: overallTotalProducts > 0
     ? (overallTotalValue / overallTotalProducts).toLocaleString('es-MX', { style: 'currency', currency: 'MXN' })
     : '$0.00',
-});
+  });
 
-
+const columnsSummary = [
+  {
+    field: 'id',
+    headerName: '',
+    flex: isSmallScreen ? 0 : 0.5,
+    minWidth: isSmallScreen ? 50 : 80,
+  },
+  {
+    field: 'totalProducts',
+    headerName: 'Total products',
+    flex: isSmallScreen ? 0 : 1,
+    minWidth: isSmallScreen ? 140 : 180,
+  },
+  {
+    field: 'totalValue',
+    headerName: 'Total Value',
+    flex: isSmallScreen ? 0 : 1,
+    minWidth: isSmallScreen ? 130 : 180,
+  },
+  {
+    field: 'averagePrice',
+    headerName: 'Average Price',
+    flex: isSmallScreen ? 0 : 1,
+    minWidth: isSmallScreen ? 150 : 200,
+  },
+];
 
   return (
     <Box>

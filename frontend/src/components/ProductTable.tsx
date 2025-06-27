@@ -1,23 +1,22 @@
 import {useState } from 'react';
 import { DataGrid, GridRenderCellParams } from '@mui/x-data-grid';
-import { Box, IconButton, Pagination, Checkbox, FormHelperText, Typography} from '@mui/material';
+import { Box, IconButton, Pagination, Checkbox } from '@mui/material';
 import { Edit, Delete } from '@mui/icons-material';
-import { Product } from '../types/Product';
+import { Product, ProductTableProps } from '../types/Product';
+import { useMediaQuery, useTheme } from '@mui/material';
+
 import styles from './styles/ProductTable.module.css';
 
-interface ProductTableProps {
-  products: Product[];
-  onEdit: (product: Product) => void;
-  onDelete: (product: Product) => void;
-onStockChange: (product: Product) => void; //
-}
-
 function ProductTable({ products, onEdit, onDelete, onStockChange }: ProductTableProps) {
+  const theme = useTheme();
+  const isLargeScreen = useMediaQuery(theme.breakpoints.down('lg'));
+  
   const columns = [
     {
-      field: 'inStock',
+      field: 'inStock', 
       headerName: '',
-      flex: 0.5,
+      flex: 0.3,
+      minWidth: 50,
       renderCell: (params: GridRenderCellParams) => {
         const product: Product = params.row;
 
@@ -35,12 +34,13 @@ function ProductTable({ products, onEdit, onDelete, onStockChange }: ProductTabl
         );
       },
     },
-    { field: 'category', headerName: 'Category', flex: 1 },
-    { field: 'name', headerName: 'Name', flex: 1 },
+    { field: 'category', headerName: 'Category', flex: 0.7,   minWidth: 100},
+    { field: 'name', headerName: 'Name', flex: 0.7,   minWidth: 120 },
     {
       field: 'price',
       headerName: 'Price',
-      flex: 0.8,
+      flex: 0.4,
+      minWidth: 100,
       renderCell: (params: GridRenderCellParams) => {
         const price = Number(params.value).toLocaleString('es-MX');
         return <span>${price}</span>;
@@ -50,7 +50,8 @@ function ProductTable({ products, onEdit, onDelete, onStockChange }: ProductTabl
     {
       field: 'expirationDate',
       headerName: 'Expiration Date',
-      flex: 0.8,
+      flex: 0.6,
+        minWidth: 120,
       renderCell: (params: GridRenderCellParams) => {
         const expDate = params.value;
         return expDate ? expDate : 'N/A';
@@ -60,6 +61,7 @@ function ProductTable({ products, onEdit, onDelete, onStockChange }: ProductTabl
       field: 'stock',
       headerName: 'Stock',
       flex: 0.5,
+      minWidth: 80, 
       renderCell: (params: GridRenderCellParams) => {
         const stock = params.value;
         let color = 'inherit';
@@ -80,18 +82,21 @@ function ProductTable({ products, onEdit, onDelete, onStockChange }: ProductTabl
       field: 'actions',
       headerName: 'Actions',
       flex: 1,
+        minWidth: 120,
       sortable: false,
       filterable: false,
       renderCell: (params: { row: Product }) => (
-        <>
-          <IconButton color="primary" onClick={() => onEdit(params.row)}>
-            <Edit />Edit
-          </IconButton>
-          <IconButton color="error" onClick={() => onDelete(params.row)}>
-            <Delete />Delete
-          </IconButton>
-        </>
-      ),
+      <>
+        <IconButton color="primary" onClick={() => onEdit(params.row)} title="Edit">
+          <Edit />
+          {!isLargeScreen && <span style={{ marginLeft: 4 }}>Edit</span>}
+        </IconButton>
+        <IconButton color="error" onClick={() => onDelete(params.row)} title="Delete">
+          <Delete />
+          {!isLargeScreen && <span style={{ marginLeft: 4 }}>Delete</span>}
+        </IconButton>
+      </>
+    )
     },
   ];
 
@@ -103,7 +108,7 @@ function ProductTable({ products, onEdit, onDelete, onStockChange }: ProductTabl
   );
 
   return (
-    <Box className={styles.box}>
+    <Box className={styles.box} sx={{overflowX: 'auto'}}>
       <DataGrid className='table'
         rows={paginatedProducts}
         columns={columns}

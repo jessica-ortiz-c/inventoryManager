@@ -30,7 +30,7 @@
   }
 }
 
-/* Responsivo para pantallas medianas */
+/* Responsive for medium screen */
 @media (max-width: 900px) {
   .App-body {
      width: 95%;
@@ -64,4 +64,3 @@
 .MuiChip-deleteIcon:hover {
   color: #3b1b5e !important;
 }
-

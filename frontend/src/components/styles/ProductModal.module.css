@@ -1,23 +1,53 @@
 
+.boxContainer{
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 35%;
+  background-color: white;
+  border: 2px solid #000;
+  box-shadow: 24px;
+  padding: 2rem;
+}
+
+@media (max-width: 600px){
+  .boxContainer{
+    width: 70%;
+  }
+  .inputfield{
+    min-width: 100px;
+  }
+
+  .formlabel{
+    min-width: 70px;
+  }
+}
+
+@media (max-width: 900x){
+  .boxContainer{
+    width: 90%;
+  }
+}
+
 .box{
   display: flex;
   align-items: 'center'; 
   gap: 3rem;
   margin: 10px;
-
+  flex-wrap: wrap;
 }
 
 .formlabel{
   min-width: 100px;
-  display: flex;
-  align-items: center;
   color: black;
-  margin: 2;
+  margin: 0.5rem;
 }
 
 .inputfield{
   display: flex;
   flex:1;
+
   width: 100px;
 }
 
