@@ -2,27 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Autocomplete, Modal, Box, Button, FormLabel, TextField } from '@mui/material';
 import { NumberField } from '@base-ui-components/react';
 import styles from './styles/ProductModal.module.css';
-import { Product } from '../types/Product';
+import { Product, ProductModalProps } from '../types/Product';
 import { useCategoryContext } from '../context/CategoryContext';
-
-interface ProductModalProps {
-  open: boolean;
-  onClose: () => void;
-  onSave: (product: Product) => void;
-  product?: Product;
-}
-
-const style = {
-  position: 'absolute',
-  top: '50%',
-  left: '50%',
-  transform: 'translate(-50%, -50%)',
-  width: '35%',
-  bgcolor: 'background.paper',
-  border: '2px solid #000',
-  boxShadow: 24,
-  p: 4,
-};
 
 const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, product }) => {
   const id = React.useId();
@@ -75,7 +56,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
   return (
     <Modal open={open} onClose={onClose}>
-      <Box sx={style}  >
+      <Box className={styles.boxContainer}  >
        
           {/* Name */}
           <Box className={styles.box}>
