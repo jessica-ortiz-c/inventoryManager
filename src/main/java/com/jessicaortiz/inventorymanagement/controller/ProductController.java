@@ -1,138 +1,99 @@
 package com.jessicaortiz.inventorymanagement.controller;
 
+import com.jessicaortiz.inventorymanagement.dto.ProductRequestDTO;
 import com.jessicaortiz.inventorymanagement.model.Product;
+import com.jessicaortiz.inventorymanagement.service.ProductService;
 import com.jessicaortiz.inventorymanagement.repository.ProductRepository;
 
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.*;
-import java.util.UUID;
 import java.time.LocalDate;
 
 import org.springframework.http.ResponseEntity;
-
+import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/products")
-
-//home http://192.168.1.72:3000/ 
-//office http://172.20.44.60:3000/
-@CrossOrigin(origins = "http://192.168.1.72:3000/", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
-
+//home http://192.168.1.72:3000/  methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS}
+@CrossOrigin(origins = "http://localhost:3000/", allowedHeaders = "*")
 public class ProductController {
 
-    private final ProductRepository repository;
+    private final ProductService productService;
 
-    public ProductController(ProductRepository repository) {
-        this.repository = repository;
+    public ProductController(ProductService productService) {
+        this.productService = productService;
     }
   
 
     //API endpoints
     //GET /products
-    //can filter with name and category
-
-    @GetMapping
-    public List<Product> getAll(@RequestParam(required = false) String name,
-                                @RequestParam(required = false) String category) {
-
-        Stream<Product> stream = repository.findAll().stream();
-
-        if (name != null && !name.isEmpty()) {
-            stream = stream.filter(p -> p.getName() != null &&
-                    p.getName().toLowerCase()
-                    .contains(name.toLowerCase()));
-        }
-        if (category != null && !category.isEmpty()) {
-            stream = stream.filter(p -> 
-                p.getCategory() != null &&
-                p.getCategory().stream().anyMatch(c -> c.equalsIgnoreCase(category))
-            );
-
-        }
-        
-        return stream.toList();
+    @GetMapping //@RequestParam(required = false) String name, @RequestParam(required = false) String category
+    public ResponseEntity<List<Product>> getAll() {
+        return ResponseEntity.ok(productService.getAll());
     }
     
+
+    @GetMapping("/{id}")
+    public ResponseEntity<Product> getById(@PathVariable UUID id) {
+        return productService.getById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     //POST /products
-    //Creates a product
     @PostMapping
-    public Product create(@RequestBody Product product){
-        if (product.getName() == null || product.getName().trim().isEmpty()) {
-            throw new RuntimeException("Product name cannot be empty.");
-        }
-        if (product.getPrice() == null) {
-            throw new RuntimeException("Price must be provided.");
-        }
-        if (product.getStock() == null) {
-            throw new RuntimeException("Stock must be provided.");
-        }
-        
-        product.setId(UUID.randomUUID()); 
-        Product saved = repository.save(product);
-        return saved;
+    public ResponseEntity<Product> create(@Valid @RequestBody ProductRequestDTO dto) {
+        return ResponseEntity.ok(productService.create(dto));
     }
-  
-    //PUT /products/{id}
-    //Updates product 
+
     @PutMapping("/{id}")
-    public Product update(@PathVariable UUID id,@RequestBody Product product){
-        Product existing = repository.findById(id);
-        //System.out.println(id);
-        if (existing == null) {
-            throw new RuntimeException("Product not found.");
-        }
-         if (product.getName() == null || product.getName().trim().isEmpty()) {
-            throw new RuntimeException("Product name cannot be empty.");
-        }
-        if (product.getPrice() == null) {
-            throw new RuntimeException("Price must be provided.");
-        }
-        if (product.getStock() == null) {
-            throw new RuntimeException("Stock must be provided.");
-        }
-        
-        existing.setName(product.getName()); 
-        existing.setCategory(product.getCategory()); 
-        existing.setPrice(product.getPrice()); 
-        existing.setStock(product.getStock()); 
-        existing.setExpirationDate(product.getExpirationDate()); 
-        existing.setUpdateDate(LocalDate.now());  
-        return repository.save(existing);
+    public ResponseEntity<Product> update(@PathVariable UUID id,
+                                          @Valid @RequestBody ProductRequestDTO dto) {
+        return ResponseEntity.ok(productService.update(id, dto));
     }
-  
-    //POST /products/{id}/outofstock
+
+/*     //POST /products/{id}/outofstock
     @PostMapping("/{id}/outofstock")
-    public Product outOfStock(@PathVariable UUID id){
-        Product p = repository.findById(id);
-        if (p == null) {
-            throw new RuntimeException("Product not found.");
-        }
-        p.setStock(0);
-        p.setUpdateDate(LocalDate.now()); 
-        return repository.save(p);
+    public ResponseEntity<Product> outOfStock(@PathVariable UUID id){
+        return repository.findById(id)
+                .map(p -> {
+                    p.setStock(0);
+                    Product updated = repository.save(p);
+                    return ResponseEntity.ok(updated);
+                })
+                .orElse(ResponseEntity.notFound().build());
     }
   
     //PUT /products/{id}/instock
     @PutMapping("/{id}/instock")
-    public Product inStock(@PathVariable UUID id,@RequestParam int stock){
-        Product p = repository.findById(id);
-        if (p == null) {
-            throw new RuntimeException("Product not found.");
-        }
-        p.setStock(stock);
-        p.setUpdateDate(LocalDate.now()); 
-        return repository.save(p);
+    public ResponseEntity<Product> inStock(@PathVariable UUID id,@RequestParam int stock){
+        return repository.findById(id)
+                .map(p -> {
+                    p.setStock(stock);
+                    Product updated = repository.save(p);
+                    return ResponseEntity.ok(updated);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+ */
+
+ @PostMapping("/{id}/outofstock")
+    public ResponseEntity<Product> outOfStock(@PathVariable UUID id) {
+        Product updated = productService.markOutOfStock(id);
+        return ResponseEntity.ok(updated);
     }
 
-    //DELETE
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProduct(@PathVariable UUID id) {
-    Product existing = repository.findById(id);
-    if (existing == null) {
-        return ResponseEntity.notFound().build();
+    @PutMapping("/{id}/instock")
+    public ResponseEntity<Product> inStock(@PathVariable UUID id, @RequestParam int stock) {
+        Product updated = productService.updateStock(id, stock);
+        return ResponseEntity.ok(updated);
     }
-    repository.delete(id);
-    return ResponseEntity.noContent().build();
-}
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable UUID id) {
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
+    }
 }

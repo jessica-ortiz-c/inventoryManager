@@ -95,6 +95,7 @@ const columnsSummary = [
         columns={columnsSummary}
         hideFooter
         autoHeight
+        disableColumnMenu
       />
     </Box>
   );
