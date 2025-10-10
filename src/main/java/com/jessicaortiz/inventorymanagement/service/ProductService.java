@@ -7,8 +7,6 @@ import org.springframework.stereotype.Service;
 
 import jakarta.persistence.EntityNotFoundException;
 
-
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -35,10 +33,12 @@ public class ProductService {
         Product product = new Product();
         product.setId(UUID.randomUUID());
         product.setName(dto.getName());
-        product.setPrice(BigDecimal.valueOf(dto.getPrice())); 
+        product.setCategory(dto.getCategory());
+        product.setPrice(dto.getPrice()); 
         product.setStock(dto.getStock());
         product.setCreationDate(LocalDate.now());
         product.setUpdateDate(LocalDate.now());
+        product.setExpirationDate(dto.getExpirationDate()); 
 
         return productRepository.save(product);
     }
@@ -48,9 +48,11 @@ public class ProductService {
                 .orElseThrow(() -> new RuntimeException("Product not found"));
 
         existing.setName(dto.getName());
-        existing.setPrice(BigDecimal.valueOf(dto.getPrice()));
+        existing.setCategory(dto.getCategory());
+        existing.setPrice(dto.getPrice());
         existing.setStock(dto.getStock());
         existing.setUpdateDate(LocalDate.now());
+        existing.setExpirationDate(dto.getExpirationDate()); 
 
         return productRepository.save(existing);
     }

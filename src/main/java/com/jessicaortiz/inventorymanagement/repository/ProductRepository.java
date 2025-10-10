@@ -24,14 +24,6 @@ public class ProductRepository {
   
     //Save or update a product
     public Product save(Product p) {
-       if (p == null) {
-        throw new IllegalArgumentException("Product cannot be null");
-        }
-        if (p.getId() == null) {
-            p.setId(UUID.randomUUID());
-            p.setCreationDate(java.time.LocalDate.now());
-        }
-        p.setUpdateDate(java.time.LocalDate.now());
         products.put(p.getId(), p);
         return p;
     }
