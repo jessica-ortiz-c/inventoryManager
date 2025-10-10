@@ -1,166 +1,184 @@
 import { useState } from 'react';
-import { useMediaQuery, useTheme } from '@mui/material';
-import { Box, IconButton, Checkbox, Pagination } from '@mui/material';
-import { DataGrid, GridRenderCellParams, GridSortModel } from '@mui/x-data-grid';
-import { Edit, Delete } from '@mui/icons-material';
 import { Product, ProductTableProps } from '../types/Product';
-import styles from './styles/ProductTable.module.css';
 
 function ProductTable({ products, onEdit, onDelete, onStockChange }: ProductTableProps) {
-  const theme = useTheme();
-  const isLargeScreen = useMediaQuery(theme.breakpoints.down('lg'));
-
-  const [sortModel, setSortModel] = useState<GridSortModel>([]);
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [page, setPage] = useState(1);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const itemsPerPage = 10;
 
   const sortedProducts = [...products].sort((a, b) => {
-    for (const sort of sortModel) {
-      const { field, sort: direction } = sort;
-
-      const valueA = a[field as keyof Product];
-      const valueB = b[field as keyof Product];
-
-      let comparison = 0;
-
-      if (typeof valueA === 'string' && typeof valueB === 'string') {
-        comparison = valueA.localeCompare(valueB);
-      } else if (typeof valueA === 'number' && typeof valueB === 'number') {
-        comparison = valueA - valueB;
-      } else {
-        comparison = 0;
-      }
-
-      if (comparison !== 0) {
-        return direction === 'asc' ? comparison : -comparison;
-      }
+    if (!sortField) return 0;
+    const valueA = a[sortField as keyof Product];
+    const valueB = b[sortField as keyof Product];
+    if (typeof valueA === 'string' && typeof valueB === 'string') {
+      return sortOrder === 'asc' ? valueA.localeCompare(valueB) : valueB.localeCompare(valueA);
+    } else if (typeof valueA === 'number' && typeof valueB === 'number') {
+      return sortOrder === 'asc' ? valueA - valueB : valueB - valueA;
     }
     return 0;
   });
 
-  const paginatedProducts = sortedProducts.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
+  const paginatedProducts = sortedProducts.slice((page - 1) * itemsPerPage, page * itemsPerPage);
+  const totalPages = Math.ceil(products.length / itemsPerPage);
 
-  const columns = [
-    {
-      field: 'inStock',
-      headerName: '',
-      flex: 0.3,
-      minWidth: 50,
-      sortable: false,
-      renderCell: (params: GridRenderCellParams) => {
-        const product: Product = params.row;
-        return (
-          <Checkbox
-            checked={product.stock === 0}
-            onChange={(e) => {
-              const isChecked = e.target.checked;
-              const newStock = isChecked ? 0 : 10;
-              const updatedProduct = { ...product, stock: newStock };
-              onStockChange(updatedProduct);
-            }}
-            color="primary"
-          />
-        );
-      },
-    },
-    { field: 'category', headerName: 'Category', flex: 0.7, minWidth: 100, sortable: true },
-    { field: 'name', headerName: 'Name', flex: 0.7, minWidth: 120, sortable: true },
-    {
-      field: 'price',
-      headerName: 'Price',
-      flex: 0.4,
-      minWidth: 100,
-      sortable: true,
-      renderCell: (params: GridRenderCellParams) => {
-        const price = Number(params.value).toLocaleString('es-MX');
-        return <span>${price}</span>;
-      },
-    },
-    {
-      field: 'expirationDate',
-      headerName: 'Expiration Date',
-      flex: 0.6,
-      minWidth: 120,
-      sortable: true,
-      renderCell: (params: GridRenderCellParams) => {
-        const expDate = params.value;
-        return expDate ? expDate : 'N/A';
-      },
-    },
-    {
-      field: 'stock',
-      headerName: 'Stock',
-      flex: 0.5,
-      minWidth: 80,
-      sortable: true,
-      renderCell: (params: GridRenderCellParams) => {
-        const stock = params.value;
-        let color = 'inherit';
-        if (stock < 5) color = 'red';
-        else if (stock <= 10) color = 'orange';
+  const toggleSort = (field: string) => {
+    if (sortField === field) {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortOrder('asc');
+    }
+  };
 
-        return (
-          <span style={{ color, textDecoration: stock === 0 ? 'line-through' : 'none' }}>
-            {stock}
-          </span>
-        );
-      },
-    },
-    {
-      field: 'actions',
-      headerName: 'Actions',
-      flex: 1,
-      minWidth: 120,
-      sortable: false,
-      filterable: false,
-      renderCell: (params: { row: Product }) => (
-        <>
-          <IconButton color="primary" onClick={() => onEdit(params.row)} title="Edit">
-            <Edit />
-            {!isLargeScreen && <span style={{ marginLeft: 4 }}>Edit</span>}
-          </IconButton>
-          <IconButton color="error" onClick={() => onDelete(params.row)} title="Delete">
-            <Delete />
-            {!isLargeScreen && <span style={{ marginLeft: 4 }}>Delete</span>}
-          </IconButton>
-        </>
-      ),
-    },
-  ];
+  const toggleSelectAll = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.checked) {
+      const validIds = paginatedProducts
+        .map((p) => p.id)
+        .filter((id): id is string => typeof id === 'string');
+      setSelectedProducts(validIds);
+    } else {
+      setSelectedProducts([]);
+    }
+  };
+
+  const toggleSelectOne = (id: string | undefined) => {
+    if (!id) return;
+    setSelectedProducts((prev) =>
+      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
+    );
+  };
 
   return (
-    <Box className={styles.box}>
-      <DataGrid
-        rows={paginatedProducts}
-        columns={columns}
-        hideFooter
-        disableColumnMenu
-        sx={{ width: '100%' }}
-        sortingMode="server"
-        sortingOrder={['asc', 'desc']}
-        sortModel={sortModel}
-        onSortModelChange={(newModel) => setSortModel(newModel)}
-        getRowId={(row) => row.id!}
-        getRowClassName={(params) => {
-          const expDate = params.row.expirationDate;
-          if (!expDate) return '';
-          const diffDays = Math.ceil((new Date(expDate).getTime() - new Date().getTime()) / (1000 * 3600 * 24));
-          if (diffDays < 7) return 'row-red';
-          if (diffDays <= 14) return 'row-yellow';
-          return 'row-green';
-        }}
-      />
+    <div className="overflow-x-auto mt-6">
+      <table className="min-w-full bg-white border border-gray-200 rounded-lg shadow-sm">
+        <thead className="bg-gray-100 text-gray-700 text-sm uppercase">
+          <tr>
+            <th className="py-2 px-4 text-center">
+              <input
+                type="checkbox"
+                onChange={toggleSelectAll}
+                checked={
+                  paginatedProducts.length > 0 &&
+                  paginatedProducts.every(
+                    (p) => p.id && selectedProducts.includes(p.id)
+                  )
+                }
+                className="w-4 h-4 accent-blue-600"
+              />
+            </th>
+            <th className="py-2 px-4 cursor-pointer" onClick={() => toggleSort('category')}>
+              Category
+            </th>
+            <th className="py-2 px-4 cursor-pointer" onClick={() => toggleSort('name')}>
+              Name
+            </th>
+            <th className="py-2 px-4 cursor-pointer" onClick={() => toggleSort('price')}>
+              Price
+            </th>
+            <th className="py-2 px-4">Expiration</th>
+            <th className="py-2 px-4">Stock</th>
+            <th className="py-2 px-4">Actions</th>
+          </tr>
+        </thead>
 
-      <Pagination
-        className={styles.pagination}
-        count={Math.ceil(products.length / itemsPerPage)}
-        page={page}
-        onChange={(e, value) => setPage(value)}
-      />
-    </Box>
+        <tbody>
+          {paginatedProducts.map((product) => {
+            const diffDays = product.expirationDate
+              ? Math.ceil(
+                  (new Date(product.expirationDate).getTime() - new Date().getTime()) /
+                    (1000 * 3600 * 24)
+                )
+              : null;
+
+            let rowColor = '';
+            if (diffDays !== null) {
+              if (diffDays < 7) rowColor = 'bg-red-50';
+              else if (diffDays <= 14) rowColor = 'bg-yellow-50';
+              else rowColor = 'bg-green-50';
+            }
+
+            // 🎨 Determinar color del stock
+            let stockColor = 'text-gray-700 font-medium';
+            if (product.stock < 5) stockColor = 'text-red-600 font-medium';
+            else if (product.stock <= 10) stockColor = 'text-orange-500 font-medium';
+
+            return (
+              <tr
+                key={product.id ?? Math.random()}
+                className={`border-t hover:bg-gray-50 transition-colors ${rowColor}`}
+              >
+                <td className="py-2 px-4 text-center">
+                  <input
+                    type="checkbox"
+                    checked={product.id ? selectedProducts.includes(product.id) : false}
+                    onChange={() => toggleSelectOne(product.id)}
+                    className="w-4 h-4 accent-blue-600"
+                  />
+                </td>
+
+                {/* ✅ Categoría (string simple) */}
+                <td className="py-2 px-4">{product.category || 'Sin categoría'}</td>
+
+                {/* ✅ Nombre */}
+                <td className="py-2 px-4">{product.name}</td>
+
+                {/* ✅ Precio */}
+                <td className="py-2 px-4">
+                  ${Number(product.price).toLocaleString('es-MX')}
+                </td>
+
+                {/* ✅ Fecha de expiración */}
+                <td className="py-2 px-4">
+                  {product.expirationDate ? product.expirationDate : 'N/A'}
+                </td>
+
+                {/* ✅ Stock colorizado */}
+                <td className={`py-2 px-4 text-center ${stockColor}`}>
+                  {product.stock}
+                </td>
+
+                {/* ✅ Acciones */}
+                <td className="py-2 px-4 flex items-center gap-3 justify-center">
+                  <button
+                    onClick={() => onEdit(product)}
+                    className="text-blue-600 hover:text-blue-800"
+                    title="Editar"
+                  >
+                    ✏️
+                  </button>
+                  <button
+                    onClick={() => onDelete(product)}
+                    className="text-red-600 hover:text-red-800"
+                    title="Eliminar"
+                  >
+                    🗑️
+                  </button>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+
+      {/* ✅ Paginación */}
+      <div className="flex justify-center mt-4 space-x-2">
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i + 1}
+            onClick={() => setPage(i + 1)}
+            className={`px-3 py-1 rounded ${
+              page === i + 1
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 

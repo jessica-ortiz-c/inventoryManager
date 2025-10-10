@@ -1,19 +1,17 @@
 import React, { useEffect, useState } from 'react';
-import { Autocomplete, Modal, Box, Button, FormLabel, TextField } from '@mui/material';
-import { NumberField } from '@base-ui-components/react';
-import styles from './styles/ProductModal.module.css';
 import { Product, ProductModalProps } from '../types/Product';
 import { useCategoryContext } from '../context/CategoryContext';
 
 const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, product }) => {
-  const id = React.useId();
-
+ // const id = React.useId();
   const [name, setName] = useState('');
   const { categories, addCategory } = useCategoryContext(); //Context for categories, it helps to new categories be saved 
-  const [category, setCategory] = useState<string[]>([]);
+  const [category, setCategory] = useState<string>(''); // un único string
+
   const [stock, setStock] = useState(0);
   const [price, setPrice] = useState(0);
-  const [expirationDate, setExpirationDate] = useState<string | null>(null);
+  const [expirationDate, setExpirationDate] = useState<string>(''); // nunca null
+
 
   useEffect(() => {
     if (product) { //if there's a product, for editing
@@ -21,10 +19,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
       setCategory(product.category);
       setStock(product.stock);
       setPrice(product.price);
-      setExpirationDate(product.expirationDate);
+      setExpirationDate(product.expirationDate || '');
     } else { //if there's no product, for new product
       setName('');
-      setCategory([]);
+      setCategory('');
       setStock(0);
       setPrice(0);
       setExpirationDate('');
@@ -33,170 +31,143 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
   //simple validations
     const handleSave = () => {
-    if (!name.trim()) {
-      alert('Name is required');
-      return;
-    }
-    if (category.length === 0) {
-      alert('Select at least one');
-      return;
-    }
-    
-    const newProduct: Product = {
-      id: product?.id,
-      name,
-      category,
-      stock,
-      price,
-      expirationDate,
-    };
-    onSave(newProduct);
-    onClose();
+  if (!name.trim()) {
+    alert('Name is required');
+    return;
+  }
+  if (!category) {
+    alert('Select a category');
+    return;
+  }
+
+  const newProduct: Product = {
+    id: product?.id,
+    name,
+    category,
+    stock: isNaN(stock) ? 0 : stock,
+    price: isNaN(price) ? 0 : price,
+    expirationDate: expirationDate ? expirationDate : null,
   };
 
+  console.log("Producto a guardar:", newProduct);
+  onSave(newProduct);
+  onClose();
+}; 
+
+  
+
   return (
-    <Modal open={open} onClose={onClose}>
-      <Box className={styles.boxContainer}  >
+     <div
+      className={`fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50 transition-opacity duration-300
+        ${open ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}
+    >
+      <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-lg space-y-5">
+        <h2 className="text-xl font-semibold text-gray-800 mb-2">
+          {product ? 'Edit Product' : 'Add New Product'}
+        </h2>
        
           {/* Name */}
-          <Box className={styles.box}>
-            <FormLabel htmlFor="product-name" className={styles.formlabel}>Name</FormLabel>
-            <TextField id='product-name' className={styles.inputfield}
-              required
-              label='Name'
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              variant="outlined"
-          
-            />
-          </Box>
+          <div>
+          <label className="block text-sm font-semibold mb-1">Name</label>
+          <input
+            type="text"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
+          />
+        </div>
 
           {/* Category */}
-          <Box className={styles.box}>
-            <FormLabel htmlFor="product-category" className={styles.formlabel}>Category</FormLabel>
-             <Autocomplete id='categories' className={styles.inputfield}
-              multiple
-              freeSolo
-              options={categories}
-              value={category}
-              onChange={(event, newValue) => {
-                setCategory(newValue);
-                newValue.forEach((cat) => addCategory(cat)); // adds new categories
-              }}
-              renderInput={(params) => (
-                <TextField {...params}
-                  required  
-                  id='product-category'
-                  label="Category" placeholder="Select or type" />
-              )}
-            />
-          </Box>
+          <div>
+          <label className="block text-sm font-semibold mb-1">Category</label>
+         <div className="flex flex-wrap gap-2 border border-gray-300 p-2 rounded-lg">
+        {categories.map((cat) => (
+          <button
+            key={cat}
+            type="button"
+            onClick={() => setCategory(cat)} // solo asigna una categoría
+            className={`px-3 py-1 rounded-full text-sm ${
+              category === cat ? 'bg-blue-500 text-white' : 'bg-gray-100 hover:bg-gray-200'
+            }`}
+          >
+            {cat}
+          </button>
+        ))}
+      </div>
+
+        </div>
 
           {/* Stock */}
-           <Box className={styles.box} > 
-            <FormLabel htmlFor="product-stock" className={styles.formlabel}>Stock</FormLabel>
-            <NumberField.Root id={id} value={stock} min={0} max={1000} className={styles.Field}>
-              <NumberField.Group className={styles.Group}>
-                <NumberField.Decrement
-                  className={styles.Decrement}
-                  onClick={() => setStock((prev) => Math.max(prev - 1, 0))}
-                >
-                  <MinusIcon />
-                </NumberField.Decrement>
-
-                <NumberField.Input id='product-stock'
-                  className={styles.Input}
-                  value={stock}
-
-                  onChange={(e) => {
-                    const newValue = Number(e.target.value);
-                    if (!isNaN(newValue)) setStock(newValue);
-                  }}
-                />
-                <NumberField.Increment
-                  className={styles.Increment}
-                  onClick={() => setStock((prev) => prev + 1)}
-                >
-                  <PlusIcon />
-                </NumberField.Increment>
-              </NumberField.Group>
-            </NumberField.Root>
-          </Box>
+           <div className="flex items-center justify-between">
+          <label className="font-semibold">Stock</label>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setStock((prev) => Math.max(prev - 1, 0))}
+              
+              className="px-2 py-1 border rounded-md bg-gray-100 hover:bg-gray-200"
+              
+            >
+              -
+            </button>
+            <input
+              type="number"
+              min={0}
+              value={stock}
+              onChange={(e) => setStock(Number(e.target.value))}
+              className="w-16 text-center border border-gray-300 rounded-md"
+            />
+            <button
+              onClick={() => setStock((prev) => prev + 1)}
+              className="px-2 py-1 border rounded-md bg-gray-100 hover:bg-gray-200"
+            >
+              +
+            </button>
+          </div>
+        </div>
 
           {/* Unit Price */}
-          <Box className={styles.box}>
-            <FormLabel htmlFor="product-price" className={styles.formlabel}>Unit Price</FormLabel>
-            <NumberField.Root id={id} value={price} min={0} max={1000} className={styles.Field}>
-              
-              <NumberField.Group className={styles.Group}>
-                <NumberField.Decrement
-                  className={styles.Decrement}
-                  onClick={() => setPrice((prev) => Math.max(prev - 1, 0))}
-                >
-                  <MinusIcon />
-                </NumberField.Decrement>
-                <NumberField.Input id="product-price"
-                  className={styles.Input}
-                  value={price}
-                  onChange={(e) => {
-                    const newValue = parseFloat(e.target.value);
-                    if (!isNaN(newValue)) setPrice(newValue);
-                  }}
-                />
-                <NumberField.Increment
-                  className={styles.Increment}
-                  onClick={() => setPrice((prev) => prev + 1)}
-                >
-                  <PlusIcon />
-                </NumberField.Increment>
-              </NumberField.Group>
-            </NumberField.Root>
-          </Box>
+          <div className="flex items-center justify-between">
+          <label className="font-semibold">Unit Price</label>
+          <input
+            type="number"
+            min={0}
+            value={price}
+            onChange={(e) => setPrice(parseFloat(e.target.value))}
+            className="w-32 border border-gray-300 rounded-lg px-3 py-1 text-right"
+          />
+        </div>
+
 
           {/* Expiration Date */}
-          <Box className={styles.box}>
-            <FormLabel htmlFor="expiration-date" className={styles.formlabel} >Expiration Date</FormLabel>
-            <TextField id='expiration-date' className={styles.inputfield}
-              type="date"
-              value={expirationDate || ''} // converts to null
-              onChange={(e) => setExpirationDate(e.target.value || null)}
-              variant="outlined"
-            />
-          </Box>
+          <div>
+          <label className="block text-sm font-semibold mb-1">Expiration Date</label>
+          <input
+            type="date"
+            value={expirationDate}
+            onChange={(e) => setExpirationDate(e.target.value)} // 👈 sin null
+            className="w-full border border-gray-300 rounded-lg px-3 py-2"
+          />
+
+        </div>
 
           {/* Buttons */}
-          <Box className={styles.boxbtn} >
-            <Button className={styles.savebtn}
-              variant="contained" 
-              color="primary" 
-              onClick={handleSave}
-              > Save</Button>
-            <Button className={styles.cancelbtn}
-              variant="outlined" 
-              onClick={onClose}
-             >Cancel</Button>
-          </Box>
-      </Box>
-    </Modal>
+          <div className="flex justify-end gap-3 pt-3">
+          <button
+            onClick={handleSave}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg px-4 py-2 transition-colors"
+          >
+            Save
+          </button>
+          <button
+            onClick={onClose}
+            className="border border-gray-300 hover:bg-gray-100 rounded-lg px-4 py-2 font-semibold"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
   );
 };
 
 export default ProductModal;
-
-// Functions for FieldNumber
-
-function PlusIcon(props: React.ComponentProps<'svg'>) {
-  return (
-    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.6" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path d="M0 5H10M5 0V10" />
-    </svg>
-  );
-}
-
-function MinusIcon(props: React.ComponentProps<'svg'>) {
-  return (
-    <svg width="10" height="10" viewBox="0 0 10 10" fill="none" stroke="currentColor" strokeWidth="1.6" xmlns="http://www.w3.org/2000/svg" {...props}>
-      <path d="M0 5H10" />
-    </svg>
-  );
-}

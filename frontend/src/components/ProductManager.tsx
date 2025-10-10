@@ -115,20 +115,28 @@ const [filters, setFilters] = useState<Filters>({
   };
 
   return (
-    <>
-      <ProductFilter
-        onFilter={(newFilters) => {
-          setFilters(newFilters);
-          applyFilters(newFilters);
-        }}
-      />
+    <div className="container mx-auto p-4 flex flex-col gap-8">
+      
+      <section className="bg-gray-100 rounded-xl p-4 shadow-sm gap-4">
+        <ProductFilter
+          onFilter={(newFilters) => {
+            setFilters(newFilters);
+            applyFilters(newFilters);
+          }}
+        />
 
-      <NewProductButton
-        onClick={() => {
-          setSelectedProduct(undefined);
-          setOpen(true);
-        }}
-      />
+        <NewProductButton
+          onClick={() => {
+            setSelectedProduct(undefined);
+            setOpen(true);
+          }}
+        />
+      </section>
+      
+
+      
+
+      <section className="bg-white rounded-xl p-4 shadow-sm overflow-x-auto">
 
       <ProductTable
         products={filteredProducts}
@@ -140,7 +148,13 @@ const [filters, setFilters] = useState<Filters>({
          onStockChange={handleStockChange}
       />
 
+
+        </section>
+        <section className="bg-white rounded-xl p-4 shadow-sm overflow-x-auto">
+
       <ProductSummary products={products} />
+
+      </section>
 
       <ProductModal
         open={open}
@@ -148,7 +162,7 @@ const [filters, setFilters] = useState<Filters>({
         onSave={handleSave}
         product={selectedProduct}
       />
-    </>
+    </div>
   );
 }
 

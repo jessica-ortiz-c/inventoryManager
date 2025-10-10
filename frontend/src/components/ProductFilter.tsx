@@ -1,9 +1,5 @@
-import React, { useState , useEffect } from 'react';
-import { Box, FormControl, FormLabel, TextField,Select,  MenuItem,  Button,  Autocomplete } from '@mui/material';
+import { useState } from 'react';
 import { useCategoryContext } from '../context/CategoryContext';
-import styles from './styles/ProductFilter.module.css'
-import '../App.css'; // o el nombre del archivo global donde definiste la clase
-
 
 interface FilterProps {
   onFilter: (filters: {
@@ -21,62 +17,79 @@ function ProductFilter({ onFilter }: FilterProps) {
   const [availability, setAvailability] = useState('all');
 
   const handleSearch = () => {
-    onFilter({
-      name,
-      category: selectedCategories,
-      availability,
-    });
+    onFilter({ name, category: selectedCategories, availability });
   };
 
+  const toggleCategory = (category: string) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category)
+        ? prev.filter((c) => c !== category)
+        : [...prev, category]
+    );
+  };
 
   return (
-    <Box component="section" className={styles.section}>
-
+    <section className="bg-white p-6 shadow-md rounded-xl mb-3">
+      {/* Fila principal */}
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
         {/* Name */}
-        <Box className={styles.box}>  {/* sx={{ display: 'flex', flexDirection: 'row', alignItems: 'center', gap: 2, m: 2 }} */}
-          <FormLabel className={styles.label}
-            >Name</FormLabel>
-          <TextField
-            id="product-name"
-            variant="outlined"
+        <div className="flex flex-col gap-2 w-full md:w-1/3">
+          <label className="font-semibold text-gray-700">Name</label>
+          <input
+            type="text"
             value={name}
             onChange={(e) => setName(e.target.value)}
-            sx={{ flex: 0.5 }}
+            placeholder="Search by name..."
+            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
           />
-        </Box>
+        </div>
 
         {/* Category */}
-        <Box className={styles.box}>
-          <FormLabel className={styles.label}>Category</FormLabel>
-          <Autocomplete
-            multiple
-            options={categories}
-            value={selectedCategories}
-            onChange={(e, newValue) => setSelectedCategories(newValue)}
-            renderInput={(params) => <TextField {...params} label="Category" />}
-            sx={{ flex: 0.5 }}
-          />
-        </Box>
+        <div className="flex flex-col gap-2 w-full md:w-1/3">
+          <label className="font-semibold text-gray-700">Category</label>
+          <div className="flex flex-wrap gap-2 border border-gray-300 p-2 rounded-lg">
+            {categories.map((cat) => (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => toggleCategory(cat)}
+                className={`px-3 py-1 rounded-full text-sm ${
+                  selectedCategories.includes(cat)
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-100 hover:bg-gray-200'
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+        </div>
 
-        {/* Availability */}
-        <Box className={styles.box}>
-          <FormLabel className={styles.label} >Availability</FormLabel>
-          <Select
-            id="availability"
+        {/* Availability y Search */}
+        <div className="flex flex-col gap-2 w-full md:w-1/3">
+          <label className="font-semibold text-gray-700">Availability</label>
+          <select
             value={availability}
             onChange={(e) => setAvailability(e.target.value)}
-            sx={{ flex: 0.5 }}
+            className="border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
           >
-            <MenuItem value="in">In Stock</MenuItem>
-            <MenuItem value="out">Out of Stock</MenuItem>
-            <MenuItem value="all">All</MenuItem>
-          </Select>
-          <Button variant="outlined" className={styles.searchbtn}
-          onClick={handleSearch}>
+            <option value="all">All</option>
+            <option value="in">In Stock</option>
+            <option value="out">Out of Stock</option>
+          </select>
+
+          {/* 👇 Search Button */}
+          <button 
+            onClick={handleSearch}
+            className="mt-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg py-2 transition-colors"
+          >
             Search
-          </Button>
-        </Box>
-    </Box>
+          </button>
+        </div>
+      </div>
+
+      
+    </section>
   );
 }
 
