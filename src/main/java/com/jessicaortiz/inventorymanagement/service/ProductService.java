@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 @Service
 public class ProductService {
@@ -21,8 +23,8 @@ public class ProductService {
         this.productRepository = productRepository;
     }
 
-    public List<Product> getAll() {
-        return productRepository.findAll();
+    public Page<Product> getAllPaginated(Pageable pageable) {
+        return productRepository.findAll(pageable);
     }
 
     public Optional<Product> getById(UUID id) {
@@ -55,10 +57,17 @@ public class ProductService {
         existing.setExpirationDate(dto.getExpirationDate()); 
 
         return productRepository.save(existing);
+    } 
+
+    public Product save(Product product) {
+        if (product.getId() == null) {
+            product.setId(UUID.randomUUID());
+        }
+        return productRepository.save(product);
     }
 
     public void delete(UUID id) {
-        productRepository.delete(id);
+        productRepository.deleteById(id);
     }
 
     public Product markOutOfStock(UUID id) {
@@ -78,4 +87,6 @@ public class ProductService {
                 })
                 .orElseThrow(() -> new EntityNotFoundException("Product not found with id " + id));
     }
+
+
 }
