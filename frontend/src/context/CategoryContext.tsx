@@ -1,38 +1,42 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-/* const getInitialCategories = () => {
+// Función para obtener categorías iniciales desde localStorage o valores por defecto
+const getInitialCategories = (): string[] => {
   const stored = localStorage.getItem('categories');
   return stored ? JSON.parse(stored) : ['Food', 'Electronics', 'Clothing'];
-}; */
+};
 
-//Create the context
-const CategoryContext = createContext<{
+// Tipado del contexto
+interface CategoryContextType {
   categories: string[];
   addCategory: (cat: string) => void;
-}>({
+}
+
+// Crear el contexto con valores por defecto
+const CategoryContext = createContext<CategoryContextType>({
   categories: [],
   addCategory: () => {},
 });
 
-// Hook for use the context
+// Hook para usar el contexto
 export const useCategoryContext = () => useContext(CategoryContext);
 
-// Provider of context
+// Proveedor del contexto
 export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [categories, setCategories] = useState<string[]>([
-    'Food', 'Electronics', 'Clothing',
-  ]);
+  const [categories, setCategories] = useState<string[]>(getInitialCategories);
 
   const addCategory = (newCat: string) => {
-    if (!categories.includes(newCat)) {
-      setCategories((prev) => [...prev, newCat]);
+    const trimmedCat = newCat.trim();
+    if (trimmedCat && !categories.includes(trimmedCat)) {
+      setCategories((prev) => [...prev, trimmedCat]);
     }
   };
 
+  // Sincronizar con localStorage
   useEffect(() => {
     localStorage.setItem('categories', JSON.stringify(categories));
   }, [categories]);
-  
+
   return (
     <CategoryContext.Provider value={{ categories, addCategory }}>
       {children}
