@@ -6,13 +6,12 @@ export default function ProductTable({
   products,
   onEdit,
   onDelete,
-  onStockChange,
 }: ProductTableProps) {
   const [sortConfig, setSortConfig] = useState<
     { key: keyof Product; direction: "asc" | "desc" }[]
   >([]);
 
-  // 🔹 Función para manejar el clic en los encabezados
+  // Función para manejar el clic en los encabezados
   const handleSort = (key: keyof Product, isShiftKey: boolean) => {
     setSortConfig((prev) => {
       const existing = prev.find((conf) => conf.key === key);
@@ -58,16 +57,16 @@ export default function ProductTable({
         } else if (typeof valueA === "number" && typeof valueB === "number") {
           if (valueA !== valueB) return direction === "asc" ? valueA - valueB : valueB - valueA;
         } else if (key === "expirationDate") {
-  const dateA = a.expirationDate ? new Date(a.expirationDate).getTime() : 0;
-  const dateB = b.expirationDate ? new Date(b.expirationDate).getTime() : 0;
+          const dateA = a.expirationDate ? new Date(a.expirationDate).getTime() : 0;
+          const dateB = b.expirationDate ? new Date(b.expirationDate).getTime() : 0;
 
-  // Si uno tiene fecha y el otro no, el que no tiene se va al final
-  if (dateA !== dateB) {
-    if (dateA === 0) return 1;
-    if (dateB === 0) return -1;
-    return direction === "asc" ? dateA - dateB : dateB - dateA;
-  }
-}
+          // Si uno tiene fecha y el otro no, el que no tiene se va al final
+          if (dateA !== dateB) {
+            if (dateA === 0) return 1;
+            if (dateB === 0) return -1;
+            return direction === "asc" ? dateA - dateB : dateB - dateA;
+          }
+        }
 
       }
       return 0;
@@ -155,7 +154,7 @@ export default function ProductTable({
                 colSpan={6}
                 className="text-center py-4 text-gray-500 italic"
               >
-                No hay productos disponibles
+                There's no products available
               </td>
             </tr>
           )}

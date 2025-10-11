@@ -1,6 +1,6 @@
 import { Product } from "../types/Product";
 
-export {}; // <- Esto hace que sea un módulo garantizado
+export {}; 
 
 const BASE_URL = "http://localhost:9090/products";
 
