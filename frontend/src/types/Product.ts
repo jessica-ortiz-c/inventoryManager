@@ -1,7 +1,7 @@
 export interface Product {
   id?: string;
   name: string;
-  category: string;     //String of categories
+  category: string;     
   price: number;
   stock: number;
   expirationDate: string | null; //could be null
@@ -24,4 +24,12 @@ export interface ProductModalProps {
 
 export interface ProductSummaryProps {
   products: Product[];
+}
+
+export interface PaginatedResponse {
+  content: Product[];
+  totalPages: number;
+  totalElements: number;
+  size: number;
+  number: number;
 }
