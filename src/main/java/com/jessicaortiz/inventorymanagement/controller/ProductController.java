@@ -49,6 +49,18 @@ public class ProductController {
         return ResponseEntity.ok(productPage);
     }
 
+    @GetMapping("/categories")
+public ResponseEntity<List<String>> getAllCategories() {
+    List<String> categories = productRepository.findAll()
+        .stream()
+        .map(Product::getCategory)
+        .distinct()
+        .sorted()
+        .toList();
+    return ResponseEntity.ok(categories);
+}
+
+
     @GetMapping
     public ResponseEntity<Page<Product>> getAllProducts(Pageable pageable) {
         Page<Product> products = productService.getAllPaginated(pageable);
