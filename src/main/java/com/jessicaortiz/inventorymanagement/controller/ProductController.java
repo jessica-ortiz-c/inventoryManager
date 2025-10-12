@@ -2,6 +2,7 @@ package com.jessicaortiz.inventorymanagement.controller;
 
 import com.jessicaortiz.inventorymanagement.dto.ProductRequestDTO;
 import com.jessicaortiz.inventorymanagement.model.Product;
+import com.jessicaortiz.inventorymanagement.service.CategoryService;
 import com.jessicaortiz.inventorymanagement.service.ProductService;
 
 import org.springframework.web.bind.annotation.*;
@@ -22,9 +23,11 @@ import jakarta.validation.Valid;
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryService categoryService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
     //Pagination
@@ -64,6 +67,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<Product> create(@Valid @RequestBody ProductRequestDTO dto) {
         //System.out.println("DTO recibido: " + dto); // 👈 imprime todo
+        categoryService.createIfNotExists(dto.getCategory()); // crea la categoría si no existe
         return ResponseEntity.ok(productService.create(dto));
     }
 
