@@ -30,6 +30,9 @@ function ProductManager() {
   const [sortBy, setSortBy] = useState("name");
   const [order, setOrder] = useState<"asc" | "desc">("asc");
 
+  // Estado nuevo
+  const [allProducts, setAllProducts] = useState<Product[]>([]);
+
   // 🔹 Cargar productos desde el backend
   const fetchProducts = async (pageNum = 0) => {
     try {
@@ -57,10 +60,25 @@ function ProductManager() {
     }
   };
 
+const fetchAllProducts = async () => {
+  try {
+    const data = await productService.getProducts({
+      page: 0,
+      size: 9999,
+      sortBy: "name",
+      order: "asc",
+    });
+    setAllProducts(data.products || []);
+  } catch (err) {
+    console.error("❌ Error fetching all products:", err);
+  }
+};
+
   // 🔹 Efecto: recargar al cambiar filtros o sort
-  useEffect(() => {
-    fetchProducts();
-  }, [filters, sortBy, order]);
+useEffect(() => {
+  fetchProducts();
+  fetchAllProducts();
+}, [filters, sortBy, order]);
 
   // 🔹 Guardar producto
   const handleSave = async (product: Product) => {
@@ -156,7 +174,7 @@ function ProductManager() {
       </div>
 
       <section className="bg-white rounded-xl p-4 shadow-sm overflow-x-auto">
-        <ProductSummary products={products} />
+        <ProductSummary products={allProducts} />
       </section>
 
       <ProductModal open={open} onClose={() => setOpen(false)} onSave={handleSave} product={selectedProduct} />
