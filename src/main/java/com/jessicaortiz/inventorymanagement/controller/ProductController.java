@@ -2,10 +2,14 @@ package com.jessicaortiz.inventorymanagement.controller;
 
 import com.jessicaortiz.inventorymanagement.dto.ProductRequestDTO;
 import com.jessicaortiz.inventorymanagement.model.Product;
+import com.jessicaortiz.inventorymanagement.service.CategoryService;
 import com.jessicaortiz.inventorymanagement.service.ProductService;
 
 import org.springframework.web.bind.annotation.*;
 import java.util.*;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
@@ -17,17 +21,32 @@ import jakarta.validation.Valid;
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryService categoryService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, CategoryService categoryService) {
         this.productService = productService;
+        this.categoryService = categoryService;
     }
 
-    //GET /products
-    @GetMapping
-    public ResponseEntity<List<Product>> getAll() {
-        return ResponseEntity.ok(productService.getAll());
+    @GetMapping("/paginated")
+    public Page<Product> getPaginatedProducts(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(defaultValue = "name") String sortBy,
+        @RequestParam(defaultValue = "asc") String order,
+        @RequestParam(required = false) String name,
+        @RequestParam(required = false) String categories,
+        @RequestParam(required = false) String availability
+    ) {
+        return productService.getFilteredProducts(page, size, sortBy, order, name, categories, availability);
     }
-    
+
+    @GetMapping
+    public ResponseEntity<Page<Product>> getAllProducts(Pageable pageable) {
+        Page<Product> products = productService.getAllPaginated(pageable);
+        return ResponseEntity.ok(products);
+    }
+
     //GET /products/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Product> getById(@PathVariable UUID id) {
@@ -40,6 +59,7 @@ public class ProductController {
     @PostMapping
     public ResponseEntity<Product> create(@Valid @RequestBody ProductRequestDTO dto) {
         //System.out.println("DTO recibido: " + dto); // 👈 imprime todo
+        categoryService.createIfNotExists(dto.getCategory()); // crea la categoría si no existe
         return ResponseEntity.ok(productService.create(dto));
     }
 
@@ -70,4 +90,13 @@ public class ProductController {
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/categories")
+public ResponseEntity<List<String>> getProductCategories() {
+    List<String> categories = productService.getDistinctCategories();
+    return ResponseEntity.ok(categories);
+}
+
+
+
 }

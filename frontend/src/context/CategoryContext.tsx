@@ -1,30 +1,41 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
-// Función para obtener categorías iniciales desde localStorage o valores por defecto
-const getInitialCategories = (): string[] => {
-  const stored = localStorage.getItem('categories');
-  return stored ? JSON.parse(stored) : ['Food', 'Electronics', 'Clothing'];
-};
-
-// Tipado del contexto
 interface CategoryContextType {
   categories: string[];
   addCategory: (cat: string) => void;
+  refreshCategories: () => Promise<void>;
 }
 
-// Crear el contexto con valores por defecto
 const CategoryContext = createContext<CategoryContextType>({
   categories: [],
   addCategory: () => {},
+  refreshCategories: async () => {},
 });
 
-// Hook para usar el contexto
 export const useCategoryContext = () => useContext(CategoryContext);
 
-// Proveedor del contexto
 export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [categories, setCategories] = useState<string[]>(getInitialCategories);
+  const [categories, setCategories] = useState<string[]>([]);
 
+  // 🔹 Obtener categorías desde el backend
+  const fetchCategories = async () => {
+    try {
+      const res = await fetch('http://localhost:9090/categories/names'); // Endpoint correcto para nombres
+      if (!res.ok) throw new Error('Error fetching categories');
+      const data: string[] = await res.json();
+      setCategories(data);
+    } catch (err) {
+      console.error('❌ Error fetching categories:', err);
+      // Opcional: mantener categorías por defecto si falla
+      if (categories.length === 0) setCategories(['Food', 'Electronics', 'Clothing']);
+    }
+  };
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
+
+  // 🔹 Agregar categoría localmente
   const addCategory = (newCat: string) => {
     const trimmedCat = newCat.trim();
     if (trimmedCat && !categories.includes(trimmedCat)) {
@@ -32,13 +43,14 @@ export const CategoryProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   };
 
-  // Sincronizar con localStorage
-  useEffect(() => {
-    localStorage.setItem('categories', JSON.stringify(categories));
-  }, [categories]);
-
   return (
-    <CategoryContext.Provider value={{ categories, addCategory }}>
+    <CategoryContext.Provider
+      value={{
+        categories,
+        addCategory,
+        refreshCategories: fetchCategories, // permite actualizar desde cualquier componente
+      }}
+    >
       {children}
     </CategoryContext.Provider>
   );
