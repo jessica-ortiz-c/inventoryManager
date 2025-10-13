@@ -43,11 +43,11 @@ function ProductManager() {
         availability: filters.availability,
       });
 
-      if (data.content) {
-        setProducts(data.content);
+      if (data.products) {
+        setProducts(data.products);
         setTotalPages(data.totalPages);
       } else {
-        setProducts(data);
+        setProducts([]);
         setTotalPages(1);
       }
 

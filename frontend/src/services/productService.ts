@@ -5,18 +5,7 @@ export {};
 const BASE_URL = "http://localhost:9090/products";
 
 export const productService = {
-//   async getProducts(page = 0, size = 10, sortBy = "name", order = "asc") {
-//     const res = await fetch(`${BASE_URL}?page=${page}&size=${size}&sortBy=${sortBy}&order=${order}`);
-//     if (!res.ok) throw new Error("Error fetching products");
-//     const data = await res.json();
-//     return {
-//       products: data.content,
-//       totalPages: data.totalPages,
-//       totalElements: data.totalElements
-//     };
-//   },   
-
-async getProducts({
+  async getProducts({
     page = 0,
     size = 10,
     sortBy = "name",
@@ -41,13 +30,18 @@ async getProducts({
     });
 
     if (name) params.append("name", name);
-    if (category) params.append("category", category);
+    if (category) params.append("categories", category); // 👈 cambio importante
     if (availability && availability !== "all") params.append("availability", availability);
 
     const res = await fetch(`${BASE_URL}/paginated?${params.toString()}`);
     if (!res.ok) throw new Error("Error fetching products");
 
-    return res.json();
+    const data = await res.json();
+    return {
+      products: data.content,
+      totalPages: data.totalPages,
+      totalElements: data.totalElements,
+    };
   },
 
   async createProduct(product: Product) {

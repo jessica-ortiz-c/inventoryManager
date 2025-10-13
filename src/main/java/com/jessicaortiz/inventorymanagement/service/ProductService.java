@@ -93,38 +93,62 @@ public class ProductService {
                 .orElseThrow(() -> new EntityNotFoundException("Product not found with id " + id));
     }
 
-    public Page<Product> getFilteredProducts(
-        int page,
-        int size,
-        String sortBy,
-        String order,
-        String name,
-        String availability,
-        String categories
-) {
-    Sort.Direction direction = order.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
-    Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+    public Page<Product> getFilteredProducts
+        (int page, int size, String sortBy, String order,
+        String name, String categories, String availability) {
+    Pageable pageable = PageRequest.of(page, size, Sort.by(Sort.Direction.fromString(order), sortBy));
 
-    // Traemos todos los productos paginados
-    Page<Product> products = productRepository.findAll(pageable);
+    // Filtrar todos los productos primero
+    List<Product> filtered = productRepository.findAll().stream()
+        .filter(p -> name == null || p.getName().toLowerCase().contains(name.toLowerCase()))
+        .filter(p -> categories == null || categories.isEmpty() || categories.contains(p.getCategory()))
+        .filter(p -> availability == null || availability.equals("all") ||
+            (availability.equals("in") && p.getStock() > 0) ||
+            (availability.equals("out") && p.getStock() == 0))
+        .toList();
 
-    // 🔍 Filtrado en memoria
-    List<Product> filtered = products.getContent().stream()
-            .filter(p -> name == null || p.getName().toLowerCase().contains(name.toLowerCase()))
-            .filter(p -> {
-                if ("in".equalsIgnoreCase(availability)) return p.getStock() > 0;
-                if ("out".equalsIgnoreCase(availability)) return p.getStock() == 0;
-                return true;
-            })
-            .filter(p -> {
-                if (categories == null || categories.isEmpty()) return true;
-                List<String> catList = List.of(categories.split(","));
-                return catList.contains(p.getCategory());
-            })
-            .collect(Collectors.toList());
+    // Luego paginar manualmente
+    int start = (int) pageable.getOffset();
+    int end = Math.min((start + pageable.getPageSize()), filtered.size());
+    List<Product> paged = filtered.subList(start, end);
 
-    return new PageImpl<>(filtered, pageable, filtered.size());
+    return new PageImpl<>(paged, pageable, filtered.size());
 }
+
+
+
+//     public Page<Product> getFilteredProducts(
+//         int page,
+//         int size,
+//         String sortBy,
+//         String order,
+//         String name,
+//         String availability,
+//         String categories
+// ) {
+//     Sort.Direction direction = order.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+//     Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+//     // Traemos todos los productos paginados
+//     Page<Product> products = productRepository.findAll(pageable);
+
+//     // 🔍 Filtrado en memoria
+//     List<Product> filtered = products.getContent().stream()
+//             .filter(p -> name == null || p.getName().toLowerCase().contains(name.toLowerCase()))
+//             .filter(p -> {
+//                 if ("in".equalsIgnoreCase(availability)) return p.getStock() > 0;
+//                 if ("out".equalsIgnoreCase(availability)) return p.getStock() == 0;
+//                 return true;
+//             })
+//             .filter(p -> {
+//                 if (categories == null || categories.isEmpty()) return true;
+//                 List<String> catList = List.of(categories.split(","));
+//                 return catList.contains(p.getCategory());
+//             })
+//             .collect(Collectors.toList());
+
+//     return new PageImpl<>(filtered, pageable, filtered.size());
+// }
 
 public List<String> getDistinctCategories() {
     return productRepository.findDistinctCategories();
