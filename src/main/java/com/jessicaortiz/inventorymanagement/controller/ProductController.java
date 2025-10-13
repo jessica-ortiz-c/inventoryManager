@@ -32,33 +32,40 @@ public class ProductController {
 
     //Pagination
     // GET /products/paginated?page=0&size=10&sortBy=name&order=asc
+    // @GetMapping("/paginated")
+    // public ResponseEntity<Page<Product>> getAllProducts(
+    //         @RequestParam(defaultValue = "0") int page,
+    //         @RequestParam(defaultValue = "10") int size,
+    //         @RequestParam(defaultValue = "name") String sortBy,
+    //         @RequestParam(defaultValue = "asc") String order) {
+
+    //     Sort sort = order.equalsIgnoreCase("asc") ?
+    //             Sort.by(sortBy).ascending() :
+    //             Sort.by(sortBy).descending();
+
+    //     Pageable pageable = PageRequest.of(page, size, sort);
+
+    //     Page<Product> productPage = productService.getAllPaginated(pageable);
+    //     return ResponseEntity.ok(productPage);
+    // }
+
+    // GET /products/paginated?page=0&size=10&sortBy=name&order=asc&name=choco&availability=in&categories=Food
     @GetMapping("/paginated")
-    public ResponseEntity<Page<Product>> getAllProducts(
+    public ResponseEntity<Page<Product>> getFilteredProducts(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
-            @RequestParam(defaultValue = "asc") String order) {
-
-        Sort sort = order.equalsIgnoreCase("asc") ?
-                Sort.by(sortBy).ascending() :
-                Sort.by(sortBy).descending();
-
-        Pageable pageable = PageRequest.of(page, size, sort);
-
-        Page<Product> productPage = productService.getAllPaginated(pageable);
-        return ResponseEntity.ok(productPage);
+            @RequestParam(defaultValue = "asc") String order,
+            @RequestParam(required = false) String name,
+            @RequestParam(defaultValue = "all") String availability,
+            @RequestParam(required = false) String categories
+    ) {
+        Page<Product> products = productService.getFilteredProducts(page, size, sortBy, order, name, availability, categories);
+        return ResponseEntity.ok(products);
     }
 
-    @GetMapping("/categories")
-public ResponseEntity<List<String>> getAllCategories() {
-    List<String> categories = productRepository.findAll()
-        .stream()
-        .map(Product::getCategory)
-        .distinct()
-        .sorted()
-        .toList();
-    return ResponseEntity.ok(categories);
-}
+
+
 
 
     @GetMapping
@@ -110,4 +117,13 @@ public ResponseEntity<List<String>> getAllCategories() {
         productService.delete(id);
         return ResponseEntity.noContent().build();
     }
+
+    @GetMapping("/categories")
+public ResponseEntity<List<String>> getProductCategories() {
+    List<String> categories = productService.getDistinctCategories();
+    return ResponseEntity.ok(categories);
+}
+
+    
+
 }

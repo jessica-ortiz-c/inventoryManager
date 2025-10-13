@@ -7,6 +7,7 @@ import ProductModal from "./ProductModal";
 import NewProductButton from "./NewProductButton";
 import ProductSummary from "./ProductSummary";
 import { useCategoryContext } from "../context/CategoryContext";
+import { productService } from "../services/productService";
 
 interface Filters {
   name: string;
@@ -32,18 +33,15 @@ function ProductManager() {
   // 🔹 Cargar productos desde el backend
   const fetchProducts = async (pageNum = 0) => {
     try {
-      const params = new URLSearchParams({
-        page: String(pageNum),
-        size: String(size),
+      const data = await productService.getProducts({
+        page: pageNum,
+        size,
         sortBy,
         order,
-        name: filters.name || "",
+        name: filters.name,
+        category: filters.category.join(","), // backend recibe como string
         availability: filters.availability,
-        categories: filters.category.join(","),
       });
-
-      const res = await fetch(`http://localhost:9090/products?${params.toString()}`);
-      const data = await res.json();
 
       if (data.content) {
         setProducts(data.content);
@@ -59,6 +57,7 @@ function ProductManager() {
     }
   };
 
+  // 🔹 Efecto: recargar al cambiar filtros o sort
   useEffect(() => {
     fetchProducts();
   }, [filters, sortBy, order]);

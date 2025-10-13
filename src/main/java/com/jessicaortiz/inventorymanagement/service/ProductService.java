@@ -8,11 +8,16 @@ import org.springframework.stereotype.Service;
 import jakarta.persistence.EntityNotFoundException;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 
 @Service
 public class ProductService {
@@ -87,6 +92,43 @@ public class ProductService {
                 })
                 .orElseThrow(() -> new EntityNotFoundException("Product not found with id " + id));
     }
+
+    public Page<Product> getFilteredProducts(
+        int page,
+        int size,
+        String sortBy,
+        String order,
+        String name,
+        String availability,
+        String categories
+) {
+    Sort.Direction direction = order.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+    Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+
+    // Traemos todos los productos paginados
+    Page<Product> products = productRepository.findAll(pageable);
+
+    // 🔍 Filtrado en memoria
+    List<Product> filtered = products.getContent().stream()
+            .filter(p -> name == null || p.getName().toLowerCase().contains(name.toLowerCase()))
+            .filter(p -> {
+                if ("in".equalsIgnoreCase(availability)) return p.getStock() > 0;
+                if ("out".equalsIgnoreCase(availability)) return p.getStock() == 0;
+                return true;
+            })
+            .filter(p -> {
+                if (categories == null || categories.isEmpty()) return true;
+                List<String> catList = List.of(categories.split(","));
+                return catList.contains(p.getCategory());
+            })
+            .collect(Collectors.toList());
+
+    return new PageImpl<>(filtered, pageable, filtered.size());
+}
+
+public List<String> getDistinctCategories() {
+    return productRepository.findDistinctCategories();
+}
 
 
 }
