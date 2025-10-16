@@ -1,59 +1,91 @@
 package com.jessicaortiz.inventorymanagement.controller;
 
+import java.util.List;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import static org.mockito.ArgumentMatchers.anyString;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.ResponseEntity;
+
 import com.jessicaortiz.inventorymanagement.model.Category;
 import com.jessicaortiz.inventorymanagement.service.CategoryService;
-import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 
-import java.util.*;
-
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.mockito.Mockito.*;
-
-@WebMvcTest(CategoryController.class)
+@ExtendWith(MockitoExtension.class)
 class CategoryControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @MockBean
+    @Mock
     private CategoryService service;
 
+    @InjectMocks
+    private CategoryController controller;
+    
+    @SuppressWarnings("null")
     @Test
-    void testGetAllCategories_ReturnsList() throws Exception {
-        List<Category> categories = List.of(new Category("1", "Food"));
+    void all_shouldReturnAllCategories() {
+        List<Category> categories = List.of(
+            new Category("1", "Food"),
+            new Category("2", "Drinks")
+        );
         when(service.findAll()).thenReturn(categories);
 
-        mockMvc.perform(get("/categories"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Food"));
+        ResponseEntity<List<Category>> response = controller.all();
+
+        assertEquals(200, response.getStatusCode().value());
+        assertNotNull(response.getBody());
+        assertEquals(2, response.getBody().size());
+        verify(service).findAll();
     }
 
     @Test
-    void testCreateCategory_Success() throws Exception {
-        Category cat = new Category("1", "Electronics");
-        when(service.create("Electronics")).thenReturn(cat);
+    void names_shouldReturnCategoryNames() {
+        List<String> names = List.of("Food", "Drinks");
+        when(service.findAllNames()).thenReturn(names);
 
-        mockMvc.perform(post("/categories")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\":\"Electronics\"}"))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Electronics"));
+        ResponseEntity<List<String>> response = controller.names();
+
+        assertEquals(200, response.getStatusCode().value());
+        assertNotNull(response.getBody());
+        assertEquals(names, response.getBody());
+        verify(service).findAllNames();
     }
 
     @Test
-    void testCreateCategory_Conflict() throws Exception {
-        when(service.create("Food")).thenThrow(new IllegalArgumentException());
+    void create_shouldCreateCategory() {
+        Category category = new Category("1", "NewCategory");
+        when(service.create("NewCategory")).thenReturn(category);
 
-        mockMvc.perform(post("/categories")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content("{\"name\":\"Food\"}"))
-                .andExpect(status().isConflict());
+        ResponseEntity<Category> response = controller.create(Map.of("name", "NewCategory"));
+
+        assertEquals(200, response.getStatusCode().value());
+        assertNotNull(response.getBody());
+        assertEquals(category, response.getBody());
+        verify(service).create("NewCategory");
+    }
+
+    @Test
+    void create_shouldReturnBadRequestWhenNameIsMissing() {
+        ResponseEntity<Category> response = controller.create(Map.of());
+
+        assertEquals(400, response.getStatusCode().value());
+        verify(service, never()).create(anyString());
+    }
+
+    @Test
+    void create_shouldReturnConflictWhenAlreadyExists() {
+        when(service.create("Duplicate")).thenThrow(new IllegalArgumentException("Already exists"));
+
+        ResponseEntity<Category> response = controller.create(Map.of("name", "Duplicate"));
+
+        assertEquals(409, response.getStatusCode().value());
+        verify(service).create("Duplicate");
     }
 }
