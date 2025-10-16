@@ -4,22 +4,31 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.UUID;
 
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import lombok.*;
+
+import jakarta.persistence.Entity;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 
+@Document(collection = "products")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-@Document(collection = "products")
+@Entity
 public class Product {
 
-    private UUID id; 
+    @Id
+    private UUID id; // Cambiado de UUID a String
+
     private String name;
-    private String category;
+    private String category; // Ahora es string
     private BigDecimal price;
     private LocalDate expirationDate;
 
@@ -30,5 +39,4 @@ public class Product {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDate updateDate;
-
 }
