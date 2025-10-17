@@ -12,8 +12,8 @@ interface Props {
 
 export default function ProductTable({ products, onEdit, onDelete, onSortChange, sortBy, order }: Props) {
   // 🔹 Función auxiliar para determinar color de fondo según fecha de expiración
-  const getExpirationBg = (expirationDate: string | null) => {
-    if (!expirationDate) return ""; // sin color si no tiene fecha
+  const getExpirationBg = (expirationDate?: string | null) => {
+    if (!expirationDate) return ""; // cubre null o undefined
 
     const today = new Date();
     const expDate = new Date(expirationDate);
@@ -24,6 +24,7 @@ export default function ProductTable({ products, onEdit, onDelete, onSortChange,
     if (diffDays <= 14) return "bg-yellow-100";
     return "bg-green-100";
   };
+
 
   // 🔹 Determinar color de texto en celda de stock
   const getStockClass = (stock: number) => {
