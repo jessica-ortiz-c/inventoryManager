@@ -4,7 +4,7 @@ export interface Product {
   category: string;     
   price: number;
   stock: number;
-  expirationDate: string | null; //could be null
+  expirationDate?: string | null; //could be null
 }
 
 export interface ProductTableProps {

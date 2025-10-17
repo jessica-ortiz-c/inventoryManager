@@ -6,7 +6,7 @@ interface CategoryContextType {
   refreshCategories: () => Promise<void>;
 }
 
-const CategoryContext = createContext<CategoryContextType>({
+export const CategoryContext = createContext<CategoryContextType>({
   categories: [],
   addCategory: () => {},
   refreshCategories: async () => {},
