@@ -91,10 +91,14 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
         {/* 🔹 Name */}
         <div>
-          <label className="block text-sm font-semibold mb-1">Name</label>
+          <label htmlFor="product-name" className="block text-sm font-semibold mb-1">
+            Name
+          </label>
           <input
+            id="product-name"
             type="text"
             value={name}
+            placeholder="Name"
             onChange={(e) => setName(e.target.value)}
             className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-400 outline-none"
           />
@@ -153,7 +157,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
         {/* 🔹 Stock */}
         <div className="flex items-center justify-between">
-          <label className="font-semibold">Stock</label>
+          <label htmlFor="product-stock" className="font-semibold">Stock</label>
           <div className="flex items-center gap-2">
             <button
               onClick={() => setStock((prev) => Math.max(prev - 1, 0))}
@@ -162,6 +166,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
               -
             </button>
             <input
+              id='product-stock'
               type="number"
               min={0}
               value={stock}
@@ -178,9 +183,10 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
         </div>
 
         {/* 🔹 Price */}
-        <div className="flex items-center justify-between">
-          <label className="font-semibold">Unit Price</label>
+        <div>
+          <label htmlFor="product-price" className="font-semibold">Unit Price</label>
           <input
+            id="product-price"
             type="number"
             min={0}
             value={price}
@@ -191,8 +197,11 @@ const ProductModal: React.FC<ProductModalProps> = ({ open, onClose, onSave, prod
 
         {/* 🔹 Expiration Date */}
         <div>
-          <label className="block text-sm font-semibold mb-1">Expiration Date</label>
+          <label htmlFor="product-expiration" className="block text-sm font-semibold mb-1">
+            Expiration Date
+          </label>
           <input
+            id="product-expiration"
             type="date"
             value={expirationDate}
             onChange={(e) => setExpirationDate(e.target.value)}

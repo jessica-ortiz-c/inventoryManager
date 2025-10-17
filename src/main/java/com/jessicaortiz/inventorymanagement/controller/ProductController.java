@@ -1,22 +1,31 @@
 package com.jessicaortiz.inventorymanagement.controller;
 
+import java.util.List;
+import java.util.UUID;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
 import com.jessicaortiz.inventorymanagement.dto.ProductRequestDTO;
 import com.jessicaortiz.inventorymanagement.model.Product;
 import com.jessicaortiz.inventorymanagement.service.CategoryService;
 import com.jessicaortiz.inventorymanagement.service.ProductService;
 
-import org.springframework.web.bind.annotation.*;
-import java.util.*;
-
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
-import org.springframework.http.ResponseEntity;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/products")
-//home http://192.168.1.72:3000/  methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS}
 @CrossOrigin(origins = "http://localhost:3000/", allowedHeaders = "*")
 public class ProductController {
 
@@ -30,61 +39,50 @@ public class ProductController {
 
     @GetMapping("/paginated")
     public Page<Product> getPaginatedProducts(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size,
-        @RequestParam(defaultValue = "name") String sortBy,
-        @RequestParam(defaultValue = "asc") String order,
-        @RequestParam(required = false) String name,
-        @RequestParam(required = false) String categories,
-        @RequestParam(required = false) String availability
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String order,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String categories,
+            @RequestParam(required = false) String availability
     ) {
         return productService.getFilteredProducts(page, size, sortBy, order, name, categories, availability);
     }
 
     @GetMapping
     public ResponseEntity<Page<Product>> getAllProducts(Pageable pageable) {
-        Page<Product> products = productService.getAllPaginated(pageable);
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(productService.getAllPaginated(pageable));
     }
 
-    //GET /products/{id}
     @GetMapping("/{id}")
     public ResponseEntity<Product> getById(@PathVariable UUID id) {
         return productService.getById(id)
                 .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
-    //POST /products
     @PostMapping
     public ResponseEntity<Product> create(@Valid @RequestBody ProductRequestDTO dto) {
-        //System.out.println("DTO recibido: " + dto); // 👈 imprime todo
-        categoryService.createIfNotExists(dto.getCategory()); // crea la categoría si no existe
+        categoryService.createIfNotExists(dto.getCategory());
         return ResponseEntity.ok(productService.create(dto));
     }
 
-    //PUT /products/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Product> update(@PathVariable UUID id,
-                                          @Valid @RequestBody ProductRequestDTO dto) {
+    public ResponseEntity<Product> update(@PathVariable UUID id, @Valid @RequestBody ProductRequestDTO dto) {
         return ResponseEntity.ok(productService.update(id, dto));
     }
 
-    //POST /products/{id}/outofstock
     @PostMapping("/{id}/outofstock")
     public ResponseEntity<Product> outOfStock(@PathVariable UUID id) {
-        Product updated = productService.markOutOfStock(id);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(productService.markOutOfStock(id));
     }
 
-    //PUT /products/{id}/instock?stock=[#]
     @PutMapping("/{id}/instock")
     public ResponseEntity<Product> inStock(@PathVariable UUID id, @RequestParam int stock) {
-        Product updated = productService.updateStock(id, stock);
-        return ResponseEntity.ok(updated);
+        return ResponseEntity.ok(productService.updateStock(id, stock));
     }
 
-    //DELETE /products/{id}
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable UUID id) {
         productService.delete(id);
@@ -92,11 +90,7 @@ public class ProductController {
     }
 
     @GetMapping("/categories")
-public ResponseEntity<List<String>> getProductCategories() {
-    List<String> categories = productService.getDistinctCategories();
-    return ResponseEntity.ok(categories);
-}
-
-
-
+    public ResponseEntity<List<String>> getProductCategories() {
+        return ResponseEntity.ok(productService.getDistinctCategories());
+    }
 }

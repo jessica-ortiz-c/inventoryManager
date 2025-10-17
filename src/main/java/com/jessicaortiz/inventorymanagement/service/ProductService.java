@@ -1,12 +1,5 @@
 package com.jessicaortiz.inventorymanagement.service;
 
-import com.jessicaortiz.inventorymanagement.dto.ProductRequestDTO;
-import com.jessicaortiz.inventorymanagement.model.Product;
-import com.jessicaortiz.inventorymanagement.repository.ProductRepository;
-import org.springframework.stereotype.Service;
-
-import jakarta.persistence.EntityNotFoundException;
-
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -17,6 +10,13 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.stereotype.Service;
+
+import com.jessicaortiz.inventorymanagement.dto.ProductRequestDTO;
+import com.jessicaortiz.inventorymanagement.model.Product;
+import com.jessicaortiz.inventorymanagement.repository.ProductRepository;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class ProductService {
@@ -37,7 +37,7 @@ public class ProductService {
 
     public Product create(ProductRequestDTO dto) {
         Product product = new Product();
-        product.setId(UUID.randomUUID());
+        product.setId(UUID.randomUUID()); // Convertimos UUID a string
         product.setName(dto.getName());
         product.setCategory(dto.getCategory());
         product.setPrice(dto.getPrice()); 
@@ -48,6 +48,7 @@ public class ProductService {
 
         return productRepository.save(product);
     }
+
 
     public Product update(UUID id, ProductRequestDTO dto) {
         Product existing = productRepository.findById(id)
@@ -122,16 +123,16 @@ public class ProductService {
                     (availability.equals("out") && p.getStock() == 0))
             // ✅ Aplicar ordenamiento manual si no usas repositorio con paginación dinámica
             .sorted((p1, p2) -> {
-                try {
-                    Object val1 = Product.class.getDeclaredMethod("get" + capitalize(sortBy)).invoke(p1);
-                    Object val2 = Product.class.getDeclaredMethod("get" + capitalize(sortBy)).invoke(p2);
-                    if (val1 instanceof Comparable && val2 instanceof Comparable) {
-                        int result = ((Comparable) val1).compareTo(val2);
-                        return direction == Sort.Direction.ASC ? result : -result;
-                    }
-                } catch (Exception ignored) {}
-                return 0;
+                int result;
+                switch (sortBy) {
+                    case "name" -> result = p1.getName().compareToIgnoreCase(p2.getName());
+                    case "price" -> result = p1.getPrice().compareTo(p2.getPrice());
+                    case "stock" -> result = Integer.compare(p1.getStock(), p2.getStock());
+                    default -> result = 0;
+                }
+                return direction == Sort.Direction.ASC ? result : -result;
             })
+
             .toList();
 
         // Paginación manual
@@ -140,12 +141,6 @@ public class ProductService {
         List<Product> paged = filtered.subList(start, end);
 
         return new PageImpl<>(paged, pageable, filtered.size());
-    }
-
-    // 🔹 Método auxiliar para capitalizar el campo de ordenamiento
-    private String capitalize(String str) {
-        if (str == null || str.isEmpty()) return str;
-        return str.substring(0, 1).toUpperCase() + str.substring(1);
     }
 
 public List<String> getDistinctCategories() {

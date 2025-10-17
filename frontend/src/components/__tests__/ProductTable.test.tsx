@@ -1,65 +1,59 @@
-import React from 'react';
-import { render, screen, fireEvent } from '@testing-library/react';
-import ProductTable from '../ProductTable';
-import { Product } from '../../types/Product';
+// src/components/__tests__/ProductTable.test.tsx
+import { render, screen, fireEvent } from "@testing-library/react";
+import ProductTable from "../ProductTable";
+import { Product } from "../../types/Product";
 
-const sampleProducts: Product[] = [
-  {
-    id: '1',
-    name: 'Laptop',
-    category: ['Electronics'],
-    stock: 5,
-    price: 1200,
-    expirationDate: '2025-12-31',
-  },
-];
+describe("ProductTable", () => {
+  const mockProducts: Product[] = [
+    { id: "1", name: "Pan", category: "Food", price: 10, stock: 5, expirationDate: "2025-12-01" },
+    { id: "2", name: "Leche", category: "Drinks", price: 20, stock: 8, expirationDate: "2025-10-10" },
+  ];
 
-describe('ProductTable', () => {
-  it('renders product data', () => {
-    render(
-      <ProductTable
-        products={sampleProducts}
-        onEdit={() => {}}
-        onDelete={() => {}}
-      />
-    );
+  const mockOnEdit = jest.fn();
+  const mockOnDelete = jest.fn();
+  const mockOnSortChange = jest.fn();
 
-    expect(screen.getByText('Laptop')).toBeInTheDocument();
-    expect(screen.getByText('Electronics')).toBeInTheDocument();
-    expect(screen.getByText('1200')).toBeInTheDocument();
+  const baseProps = {
+    onEdit: mockOnEdit,
+    onDelete: mockOnDelete,
+    onSortChange: mockOnSortChange,
+    sortBy: "name",
+    order: "asc" as const,
+  };
+
+  beforeEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('calls onEdit when Edit is clicked', () => {
-    const mockEdit = jest.fn();
-    render(
-      <ProductTable
-        products={sampleProducts}
-        onEdit={mockEdit}
-        onDelete={() => {}}
-      />
-    );
-
-    fireEvent.click(screen.getByText(/edit/i));
-    expect(mockEdit).toHaveBeenCalledTimes(1);
+  it("debe renderizar las filas de productos", () => {
+    render(<ProductTable products={mockProducts} {...baseProps} />);
+    expect(screen.getByText("Pan")).toBeInTheDocument();
+    expect(screen.getByText("Leche")).toBeInTheDocument();
   });
 
-    it('calls onDelete when Delete is clicked', () => {
-        const mockDelete = jest.fn();
-        window.confirm = jest.fn(() => true); 
+  it("debe mostrar mensaje si no hay productos", () => {
+    render(<ProductTable products={[]} {...baseProps} />);
+    expect(screen.getByText(/No products found/i)).toBeInTheDocument();
+  });
 
-        render(
-            <ProductTable
-            products={sampleProducts}
-            onEdit={() => {}}
-            onDelete={mockDelete}
-            />
-        );
+  it("debe ejecutar onEdit al presionar el botón editar", () => {
+    render(<ProductTable products={mockProducts} {...baseProps} />);
+    const editButtons = screen.getAllByRole("button", { name: /editar/i });
+    fireEvent.click(editButtons[0]);
+    expect(mockOnEdit).toHaveBeenCalledWith(mockProducts[0]);
+  });
 
-        const deleteButtons = screen.getAllByRole('button', { name: /delete/i });
-        fireEvent.click(deleteButtons[0]); 
+  it("debe ejecutar onDelete al presionar el botón eliminar", () => {
+    render(<ProductTable products={mockProducts} {...baseProps} />);
+    const deleteButtons = screen.getAllByRole("button", { name: /eliminar/i });
+    fireEvent.click(deleteButtons[1]);
+    expect(mockOnDelete).toHaveBeenCalledWith(mockProducts[1]);
+  });
 
-        expect(mockDelete).toHaveBeenCalledTimes(1);
-        });
-
+  it("debe ejecutar onSortChange al hacer click en el encabezado de columna", () => {
+    render(<ProductTable products={mockProducts} {...baseProps} />);
+    const header = screen.getByText(/Name/i);
+    fireEvent.click(header);
+    expect(mockOnSortChange).toHaveBeenCalledWith("name");
+  });
 });
- 

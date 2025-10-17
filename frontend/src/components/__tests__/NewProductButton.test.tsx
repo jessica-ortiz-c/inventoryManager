@@ -1,22 +1,16 @@
-//render mounts the component for testing
-//screen search elements in the screen
-//fireevent to simulate events
-import { render, screen, fireEvent } from '@testing-library/react';
-import NewProductButton from '../NewProductButton';
+import { render, screen, fireEvent } from "@testing-library/react";
+import NewProductButton from "../NewProductButton";
 
-
-describe('NewProductButton', () => {
-    //The button appears on the screen
-  it('should render the button with text "New product"', () => {
+describe("NewProductButton", () => {
+  it("renders correctly", () => {
     render(<NewProductButton onClick={() => {}} />);
-    expect(screen.getByRole('button', { name: /new product/i })).toBeInTheDocument();
+    expect(screen.getByText("New product")).toBeInTheDocument();
   });
-    //The event On Click is called by the button
-  it('should call onClick when the button is clicked', () => {
-    const handleClick = jest.fn();
+
+  it("calls onClick when clicked", () => {
+    const handleClick = jest.fn(); // Si usas Vitest; si no, usa jest.fn()
     render(<NewProductButton onClick={handleClick} />);
-    const button = screen.getByRole('button', { name: /new product/i });
-    fireEvent.click(button);
+    fireEvent.click(screen.getByText("New product"));
     expect(handleClick).toHaveBeenCalledTimes(1);
   });
 });
